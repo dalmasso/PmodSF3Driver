@@ -1,45 +1,13 @@
-------------------------------------------------------------------------
--- Engineer:    Dalmasso Loic
--- Create Date: 19/02/2025
--- Module Name: PmodSF3SPIModes
--- Description:
---      Pmod SF3 SPI Modes Handler for the 32 MB NOR Flash Memory MT25QL256ABA:
---      - When User Read/Write SPI Mode from/to memory (Non-Volatile / Enhanced Volatile register), the module updates its internal SPI Mode registers
---      - According to the Flash Memory specifications:
---			- At Power-up, the SPI Mode from the Non-Volatile register is used
---			- When RESET_NON_VOLATILE_COMMAND (0x99) command is executed, the SPI Mode from the Non-Volatile register is used
---			- When WRITE_ENHANCED_VOLATILE_CONFIG_COMMAND (0x..) command is executed, the SPI Mode from the Enhanced Volatile register is used
---
---      SPI Single Mode: DQ0 as Input, DQ1 as Output, DQ[3:2] NOT USED
---      SPI Dual Mode: DQ[1:0] as InOut, DQ[3:2] NOT USED
---      SPI Quad Mode: DQ[3:0] as InOut
---
---		SPI Mode Bits ('0' = Enable Bit, '1' = Disable Bit)
---		| Quad | Dual | SPI Mode Output
---		|   0  |   0  | Quad
---		|   0  |   1  | Quad
---		|   1  |   0  | Dual
---		|   1  |   1  | Single
---
--- Ports
---		Input 	-	i_sys_clock: System Input Clock
---		Input 	-	i_command: Command Byte
---		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
---		Output 	-	i_data_from_mem: Data Bytes Read from FLASH
---		Output 	-	i_data_from_mem_ready: Data Bytes Read from FLASH Ready (Read Mode) ('0': NOT Ready, '1': Ready)
---		Output 	-	o_spi_single_enable: SPI Single Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_dual_enable: SPI Dual Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_quad_enable: SPI Quad Mode Enable ('0': Disable, '1': Enable)
-------------------------------------------------------------------------
+
 
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
-ENTITY Testbench_PmodSF3SPIModes is
-END Testbench_PmodSF3SPIModes;
+ENTITY Testbench_PmodSF3SPIController is
+END Testbench_PmodSF3SPIController;
 
-ARCHITECTURE Behavioral of Testbench_PmodSF3SPIModes is
+ARCHITECTURE Behavioral of Testbench_PmodSF3SPIController is
 
 COMPONENT PmodSF3SPIModes is
 
@@ -75,6 +43,9 @@ begin
 
 -- Clock 100 MHz
 sys_clock <= not(sys_clock) after 5 ns;
+
+-- Clock Enable
+sys_clock_en <= not(sys_clock_en) after 50 ns;
 
 -- Reset
 reset <= '1', '0' after 145 ns;

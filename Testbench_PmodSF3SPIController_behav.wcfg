@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Testbench_PmodSF3SPIController_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Testbench_PmodSF3SPIController" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="21.000000 us"></ZoomEndTime>
+      <Cursor1Time time="8.205000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="156"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="32" />
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_sys_clock">
+      <obj_property name="ElementShortName">i_sys_clock</obj_property>
+      <obj_property name="ObjectShortName">i_sys_clock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_sys_clock_en">
+      <obj_property name="ElementShortName">i_sys_clock_en</obj_property>
+      <obj_property name="ObjectShortName">i_sys_clock_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_reset">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_start">
+      <obj_property name="ElementShortName">i_start</obj_property>
+      <obj_property name="ObjectShortName">i_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_spi_single_enable">
+      <obj_property name="ElementShortName">i_spi_single_enable</obj_property>
+      <obj_property name="ObjectShortName">i_spi_single_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_spi_dual_enable">
+      <obj_property name="ElementShortName">i_spi_dual_enable</obj_property>
+      <obj_property name="ObjectShortName">i_spi_dual_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_mode">
+      <obj_property name="ElementShortName">i_mode</obj_property>
+      <obj_property name="ObjectShortName">i_mode</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/mem_mode_reg">
+      <obj_property name="ElementShortName">mem_mode_reg</obj_property>
+      <obj_property name="ObjectShortName">mem_mode_reg</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/state">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/i_command">
+      <obj_property name="ElementShortName">i_command[7:0]</obj_property>
+      <obj_property name="ObjectShortName">i_command[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/i_addr_bytes">
+      <obj_property name="ElementShortName">i_addr_bytes</obj_property>
+      <obj_property name="ObjectShortName">i_addr_bytes</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/i_addr">
+      <obj_property name="ElementShortName">i_addr[23:0]</obj_property>
+      <obj_property name="ObjectShortName">i_addr[23:0]</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/i_dummy_cycles">
+      <obj_property name="ElementShortName">i_dummy_cycles</obj_property>
+      <obj_property name="ObjectShortName">i_dummy_cycles</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/dummy_cycles_reg">
+      <obj_property name="ElementShortName">dummy_cycles_reg</obj_property>
+      <obj_property name="ObjectShortName">dummy_cycles_reg</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/i_data_bytes">
+      <obj_property name="ElementShortName">i_data_bytes</obj_property>
+      <obj_property name="ObjectShortName">i_data_bytes</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/i_data_w">
+      <obj_property name="ElementShortName">i_data_w[7:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_w[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/addr_bytes_reg">
+      <obj_property name="ElementShortName">addr_bytes_reg</obj_property>
+      <obj_property name="ObjectShortName">addr_bytes_reg</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3SPIController/uut/data_bytes_reg">
+      <obj_property name="ElementShortName">data_bytes_reg</obj_property>
+      <obj_property name="ObjectShortName">data_bytes_reg</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/bit_counter">
+      <obj_property name="ElementShortName">bit_counter[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_counter[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/bit_counter_end">
+      <obj_property name="ElementShortName">bit_counter_end</obj_property>
+      <obj_property name="ObjectShortName">bit_counter_end</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_ss">
+      <obj_property name="ElementShortName">o_ss</obj_property>
+      <obj_property name="ObjectShortName">o_ss</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_sclk">
+      <obj_property name="ElementShortName">o_sclk</obj_property>
+      <obj_property name="ObjectShortName">o_sclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/sclk_rising_edge">
+      <obj_property name="ElementShortName">sclk_rising_edge</obj_property>
+      <obj_property name="ObjectShortName">sclk_rising_edge</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/sclk_falling_edge">
+      <obj_property name="ElementShortName">sclk_falling_edge</obj_property>
+      <obj_property name="ObjectShortName">sclk_falling_edge</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/io_dq">
+      <obj_property name="ElementShortName">io_dq[3:0]</obj_property>
+      <obj_property name="ObjectShortName">io_dq[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/data_w_reg">
+      <obj_property name="ElementShortName">data_w_reg[39:0]</obj_property>
+      <obj_property name="ObjectShortName">data_w_reg[39:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_next_data_w">
+      <obj_property name="ElementShortName">o_next_data_w</obj_property>
+      <obj_property name="ObjectShortName">o_next_data_w</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_data_ready">
+      <obj_property name="ElementShortName">o_data_ready</obj_property>
+      <obj_property name="ObjectShortName">o_data_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/data_r_reg">
+      <obj_property name="ElementShortName">data_r_reg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_r_reg[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/o_data_r">
+      <obj_property name="ElementShortName">o_data_r[7:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_r[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_ready">
+      <obj_property name="ElementShortName">o_ready</obj_property>
+      <obj_property name="ObjectShortName">o_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_reset">
+      <obj_property name="ElementShortName">o_reset</obj_property>
+      <obj_property name="ObjectShortName">o_reset</obj_property>
+   </wvobject>
+</wave_config>
