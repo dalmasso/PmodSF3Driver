@@ -15,7 +15,7 @@
 --		The 'i_start' signal starts the SPI communication, according to the mode (Read or Write memory), command/address/data bytes.
 --		In Write operation, when the 'o_next_data_w' is set to '1', the MSB of the 'i_data_w' is loaded.
 --		In Read operation, when the 'o_data_ready', data from memory is available in 'o_data_r' signal.
---		
+--
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
 --		Input 	-	i_sys_clock_en: System Input Clock Enable
