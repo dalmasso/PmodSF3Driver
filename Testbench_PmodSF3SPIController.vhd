@@ -1,35 +1,43 @@
 ------------------------------------------------------------------------
 -- Engineer:    Dalmasso Loic
 -- Create Date: 19/02/2025
--- Module Name: PmodSF3SPIModes
+-- Module Name: PmodSF3SPIController
 -- Description:
---      Pmod SF3 SPI Modes Handler for the 32 MB NOR Flash Memory MT25QL256ABA:
---      - When User Read/Write SPI Mode from/to memory (Non-Volatile / Enhanced Volatile register), the module updates its internal SPI Mode registers
---      - According to the Flash Memory specifications:
---			- At Power-up, the SPI Mode from the Non-Volatile register is used
---			- When RESET_NON_VOLATILE_COMMAND (0x99) command is executed, the SPI Mode from the Non-Volatile register is used
---			- When WRITE_ENHANCED_VOLATILE_CONFIG_COMMAND (0x..) command is executed, the SPI Mode from the Enhanced Volatile register is used
+--      Pmod SF3 SPI Controller for the 32 MB NOR Flash Memory MT25QL256ABA.
+--	Supports Single, Dual and Quad SPI Modes:
+--	| i_spi_dual_enable | i_spi_single_enable | SPI Mode
+--	|   	   0 	    |          1          | Single
+--	|   	   1 	    |          1   	  | Single
+--	|   	   1 	    |          0 	  | Dual
+--	|   	   0 	    |          1	  | Quad
 --
---      SPI Single Mode: DQ0 as Input, DQ1 as Output, DQ[3:2] NOT USED
---      SPI Dual Mode: DQ[1:0] as InOut, DQ[3:2] NOT USED
---      SPI Quad Mode: DQ[3:0] as InOut
---
---		SPI Mode Bits ('0' = Enable Bit, '1' = Disable Bit)
---		| Quad | Dual | SPI Mode Output
---		|   0  |   0  | Quad
---		|   0  |   1  | Quad
---		|   1  |   0  | Dual
---		|   1  |   1  | Single
+--	The 'o_ready' signal indicates this module is ready to start new SPI transmission.
+--	The 'i_start' signal starts the SPI communication, according to the mode (Read or Write memory), command/address/data bytes.
+--	In Write operation, when the 'o_next_data_w' is set to '1', the MSB of the 'i_data_w' is loaded.
+--	In Read operation, when the 'o_data_ready', data from memory is available in 'o_data_r' signal.
 --
 -- Ports
---		Input 	-	i_sys_clock: System Input Clock
---		Input 	-	i_command: Command Byte
---		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
---		Output 	-	i_data_from_mem: Data Bytes Read from FLASH
---		Output 	-	i_data_from_mem_ready: Data Bytes Read from FLASH Ready (Read Mode) ('0': NOT Ready, '1': Ready)
---		Output 	-	o_spi_single_enable: SPI Single Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_dual_enable: SPI Dual Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_quad_enable: SPI Quad Mode Enable ('0': Disable, '1': Enable)
+--	Input 	-   i_sys_clock: System Input Clock
+--	Input 	-   i_sys_clock_en: System Input Clock Enable
+--	Input	-   i_reset: System Input Reset ('0': No Reset, '1': Reset)
+--	Input	-   i_start: Start SPI Transmission ('0': No Start, '1': Start)
+--	Input	-   i_spi_single_enable: Enable SPI Single Mode ('0': Disable, '1': Enable)
+--	Input	-   i_spi_dual_enable: Enable SPI Dual Mode ('0': Disable, '1': Enable)
+--	Input	-   i_mode: Set Memory Operation Mode ('0': Write, '1': Mode)
+--	Input 	-   i_command: Command Byte
+--	Input 	-   i_addr_bytes: Number of Address Bytes to use (0 to 3 bytes)
+--	Input 	-   i_addr: Address Bytes
+--	Input 	-   i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
+--	Input 	-   i_data_bytes: Number of Data Bytes to write
+--	Input 	-   i_data_w: Data Bytes to write
+--	Output 	-   o_next_data_w: Next bit of Data Bytes trigger ('0': Disable, '1': Enable)
+--	Output 	-   o_data_r: Data Bytes read from Memory
+--	Output 	-   o_data_ready: Data Bytes read from Memory Ready ('0': NOT Ready, '1': Ready)
+--	Output 	-   o_ready: System Ready for transmission
+--	Output 	-   o_reset: Memory Reset ('0': Reset, '1': No Reset)
+--	Output 	-   o_sclk: SPI Serial Clock
+--	In/Out 	-   io_dq: SPI Serial Data
+--	Output 	-   o_ss: SPI Slave Select Line ('0': Enable, '1': Disable)
 ------------------------------------------------------------------------
 
 LIBRARY IEEE;

@@ -3,18 +3,41 @@
 -- Create Date: 19/02/2025
 -- Module Name: PmodSF3SPIController
 -- Description:
---      Pmod SF3 SPI Controller for the 32 MB NOR Flash Memory MT25QL256ABA. Supports Single, Dual and Quad SPI Modes.
+--      Pmod SF3 SPI Controller for the 32 MB NOR Flash Memory MT25QL256ABA.
+--		Supports Single, Dual and Quad SPI Modes:
+--		| i_spi_dual_enable | i_spi_single_enable | SPI Mode
+--		|   	   0 		|   	   1 		  | Single
+--		|   	   1 		|   	   1 		  | Single
+--		|   	   1 		|   	   0 		  | Dual
+--		|   	   0 		|   	   1 		  | Quad
 --
+--		The 'o_ready' signal indicates this module is ready to start new SPI transmission.
+--		The 'i_start' signal starts the SPI communication, according to the mode (Read or Write memory), command/address/data bytes.
+--		In Write operation, when the 'o_next_data_w' is set to '1', the MSB of the 'i_data_w' is loaded.
+--		In Read operation, when the 'o_data_ready', data from memory is available in 'o_data_r' signal.
+--		
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
 --		Input 	-	i_sys_clock_en: System Input Clock Enable
+--		Input	-	i_reset: System Input Reset ('0': No Reset, '1': Reset)
+--		Input	-	i_start: Start SPI Transmission ('0': No Start, '1': Start)
+--		Input	-	i_spi_single_enable: Enable SPI Single Mode ('0': Disable, '1': Enable)
+--		Input	-	i_spi_dual_enable: Enable SPI Dual Mode ('0': Disable, '1': Enable)
+--		Input	-	i_mode: Set Memory Operation Mode ('0': Write, '1': Mode)
 --		Input 	-	i_command: Command Byte
---		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
---		Output 	-	i_data_from_mem: Data Bytes Read from FLASH
---		Output 	-	i_data_from_mem_ready: Data Bytes Read from FLASH Ready (Read Mode) ('0': NOT Ready, '1': Ready)
---		Output 	-	o_spi_single_enable: SPI Single Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_dual_enable: SPI Dual Mode Enable ('0': Disable, '1': Enable)
---		Output 	-	o_spi_quad_enable: SPI Quad Mode Enable ('0': Disable, '1': Enable)
+--		Input 	-	i_addr_bytes: Number of Address Bytes to use (0 to 3 bytes)
+--		Input 	-	i_addr: Address Bytes
+--		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
+--		Input 	-	i_data_bytes: Number of Data Bytes to write
+--		Input 	-	i_data_w: Data Bytes to write
+--		Output 	-	o_next_data_w: Next bit of Data Bytes trigger ('0': Disable, '1': Enable)
+--		Output 	-	o_data_r: Data Bytes read from Memory
+--		Output 	-	o_data_ready: Data Bytes read from Memory Ready ('0': NOT Ready, '1': Ready)
+--		Output 	-	o_ready: System Ready for transmission
+--		Output 	-	o_reset: Memory Reset ('0': Reset, '1': No Reset)
+--		Output 	-	o_sclk: SPI Serial Clock
+--		In/Out 	-	io_dq: SPI Serial Data
+--		Output 	-	o_ss: SPI Slave Select Line ('0': Enable, '1': Disable)
 ------------------------------------------------------------------------
 
 LIBRARY IEEE;
@@ -37,7 +60,7 @@ PORT(
 	i_command: IN UNSIGNED(7 downto 0);
 	i_addr_bytes: IN INTEGER range 0 to 3;
 	i_addr: IN UNSIGNED(23 downto 0);
-	i_dummy_cycles: IN INTEGER range 0 to 15;
+	i_dummy_cycles: IN INTEGER range 0 to 14;
 	i_data_bytes: IN INTEGER;
 	i_data_w: IN UNSIGNED(7 downto 0);
 	o_next_data_w: OUT STD_LOGIC;
@@ -95,6 +118,10 @@ TYPE spiState is (IDLE, WRITE_CMD, WRITE_ADDR, DUMMY_CYCLES, BYTES_TXRX, STOP_TX
 signal state: spiState := IDLE;
 signal next_state: spiState;
 
+-- SPI Modes
+signal spi_single_enable_reg: STD_LOGIC := '0';
+signal spi_dual_enable_reg: STD_LOGIC := '0';
+
 -- Memory Operation Mode
 signal mem_mode_reg: STD_LOGIC := '0';
 
@@ -106,7 +133,7 @@ signal data_bytes_reg: INTEGER := 0;
 signal data_w_reg: UNSIGNED(SPI_WRITE_REGISTER_LENGTH-1 downto 0) := (others => '0');
 
 -- Number of Dummy Cycles
-signal dummy_cycles_reg: INTEGER range 0 to 15 := 0;
+signal dummy_cycles_reg: INTEGER range 0 to 14 := 0;
 
 -- Data from Memory
 signal data_r_reg: UNSIGNED(7 downto 0) := (others => '0');
@@ -257,6 +284,25 @@ begin
 	sclk_rising_edge <= sclk_edge_reg0 and not(sclk_edge_reg1);
 	sclk_falling_edge <= not(sclk_edge_reg0) and sclk_edge_reg1;
 
+	----------------------
+	-- SPI Mode Handler --
+	----------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+
+			-- Clock Enable
+			if (i_sys_clock_en = '1') then
+
+				-- Load SPI Mode Inputs
+				if (state = IDLE) then
+					spi_single_enable_reg <= i_spi_single_enable;
+					spi_dual_enable_reg <= i_spi_dual_enable;
+				end if;
+			end if;
+		end if;
+	end process;
+
 	-------------------------
 	-- Memory Mode Handler --
 	-------------------------
@@ -304,11 +350,11 @@ begin
 				elsif (sclk_falling_edge = '1') and ((state = WRITE_CMD) or (state = WRITE_ADDR) or (state = BYTES_TXRX)) then
 
 					-- Single SPI Mode: DQ0
-					if (i_spi_single_enable = '1') then
+					if (spi_single_enable_reg = '1') then
 						data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-2 downto 0) & i_data_w(7);
 					
 					-- Dual SPI Mode: DQ[1:0]
-					elsif (i_spi_dual_enable = '1') then
+					elsif (spi_dual_enable_reg = '1') then
 						data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-3 downto 0) & i_data_w(7 downto 6);
 					
 					-- Quad SPI Mode: DQ[3:0]
@@ -408,11 +454,11 @@ begin
 				if (state = IDLE) then
 
 					-- Single SPI Mode
-					if (i_spi_single_enable = '1') then
+					if (spi_single_enable_reg = '1') then
 						bit_counter_increment <= SPI_BIT_COUNTER_INCREMENT_1;
 
 					-- Dual SPI Mode
-					elsif (i_spi_dual_enable = '1')  then
+					elsif (spi_dual_enable_reg = '1')  then
 						bit_counter_increment <= SPI_BIT_COUNTER_INCREMENT_2;
 
 					-- Quad SPI Mode
@@ -439,19 +485,19 @@ begin
 	---------------------------
 	-- SPI Write Data (MOSI) --
 	---------------------------
-	process(state, mem_mode_reg, i_spi_single_enable, i_spi_dual_enable, data_w_reg)
+	process(state, mem_mode_reg, spi_single_enable_reg, spi_dual_enable_reg, data_w_reg)
 	begin
 		if (state = WRITE_CMD) or (state = WRITE_ADDR) or ((state = BYTES_TXRX) and (mem_mode_reg = MEM_WRITE_MODE)) then
 			
 			-- Single SPI Mode: DQ0
-			if (i_spi_single_enable = '1') then
+			if (spi_single_enable_reg = '1') then
 				io_dq(3) <= SPI_DQ_IDLE;
 				io_dq(2) <= SPI_DQ_IDLE;
 				io_dq(1) <= SPI_DQ_IDLE;
 				io_dq(0) <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-1);
 
 			-- Dual SPI Mode: DQ[1:0]
-			elsif (i_spi_dual_enable = '1') then
+			elsif (spi_dual_enable_reg = '1') then
 				io_dq(3) <= SPI_DQ_IDLE;
 				io_dq(2) <= SPI_DQ_IDLE;
 				io_dq(1) <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-1);
@@ -485,12 +531,12 @@ begin
 				if (sclk_rising_edge = '1') and (mem_mode_reg = MEM_READ_MODE) and (state = BYTES_TXRX) and (bit_counter_end = '0') then
 
 					-- Single SPI Mode: DQ1
-					if (i_spi_single_enable = '1') then
+					if (spi_single_enable_reg = '1') then
 						data_r_reg(7 downto 1) <= data_r_reg(6 downto 0);
 						data_r_reg(0) <= io_dq(1);
 
 					-- Dual SPI Mode: DQ[1:0]
-					elsif (i_spi_dual_enable = '1')  then
+					elsif (spi_dual_enable_reg = '1')  then
 						data_r_reg(7 downto 2) <= data_r_reg(5 downto 0);
 						data_r_reg(1) <= io_dq(1);
 						data_r_reg(0) <= io_dq(0);
