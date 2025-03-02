@@ -8,7 +8,7 @@
 --		If the wanted SPI Serial Clock Frequency cannot be generated (i.e., Specified SPI Flash Frequency > System Input Clock Frequency), the System Input Clock Frequency is used.
 --		When the System Input Clock Frequency is used, the 'o_using_sys_freq' signal is set.
 --
---		SPI Frequency References:
+--		SPI Frequency References (in MHz):
 --		| Dummy Cycles | Single SPI | Dual SPI | Quad SPI |
 --		| 	   0	   | 	133 	| 	 94    |   133    |
 --		| 	   1	   | 	 94 	| 	 79    | 	44    |
