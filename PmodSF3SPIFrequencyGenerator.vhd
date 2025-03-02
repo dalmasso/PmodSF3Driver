@@ -42,6 +42,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
+USE IEEE.MATH_REAL.ALL;
 
 ENTITY PmodSF3SPIFrequencyGenerator is
 
@@ -69,6 +70,9 @@ ARCHITECTURE Behavioral of PmodSF3SPIFrequencyGenerator is
 -- ROM Type
 type ROM_TYPE is array(INTEGER range 0 to 14) of INTEGER;
 
+-- No SPI Frequency Divider (use System Input Clock Frequency)
+constant NO_SPI_DIVIDER: INTEGER := 0;
+
 -- SPI Mode Frequency ROM Initialization
 function spi_mode_rom_initialization (rom_ref: ROM_TYPE) return ROM_TYPE is
 variable spi_freq: INTEGER;
@@ -83,17 +87,17 @@ begin
 		-- Compare System Clock to ROM Reference
 		if (spi_freq > sys_clock) then
 			-- No Clock Divider
-			spi_freq_rom(index) := 0;
+			spi_freq_rom(index) := NO_SPI_DIVIDER;
 		else
 			-- Clock Divider
-			spi_freq_rom(index) := (sys_clock / spi_freq) -1;
+			spi_freq_rom(index) := INTEGER((real(sys_clock) / real(spi_freq))) -1;
 		end if;
 	end loop;
 		
 	return spi_freq_rom;
 end spi_mode_rom_initialization;
 
--- ROM Memories
+-- ROM Memories (Frequency Inputs in MHz)
 constant SINGLE_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 94, 112, 129, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133));
 constant DUAL_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (94, 79, 97, 106, 115, 125, 133, 94, 94, 94, 94, 94, 94, 94, 94));
 constant QUAD_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 44, 61, 78, 97, 106, 115, 125, 133, 133, 133, 133, 133, 133, 133));
@@ -181,7 +185,7 @@ begin
 		if rising_edge(i_sys_clock) then
 
 			-- SPI Clock Enable
-			if (spi_clock_div_ref = 0) then
+			if (spi_clock_div_ref = NO_SPI_DIVIDER) then
 				o_using_sys_freq <= '1';
 			else
 				o_using_sys_freq <= '0';
