@@ -8,7 +8,7 @@
 --		If the wanted SPI Serial Clock Frequency cannot be generated (i.e., Specified SPI Flash Frequency > System Input Clock Frequency), the System Input Clock Frequency is used.
 --		When the System Input Clock Frequency is used, the 'o_using_sys_freq' signal is set.
 --
---		SPI Frequency References:
+--		SPI Frequency References (in MHz):
 --		| Dummy Cycles | Single SPI | Dual SPI | Quad SPI |
 --		| 	   0	   | 	133 	| 	 94    |   133    |
 --		| 	   1	   | 	 94 	| 	 79    | 	44    |
@@ -25,6 +25,7 @@
 --		| 	   12	   | 	133 	| 	 94    |   133    |
 --		| 	   13	   | 	133 	| 	 94    |   133    |
 --		| 	   14	   | 	133 	| 	 94    |   133    |
+--		| 	   15	   | 	133 	| 	 94    |   133    |
 --
 -- Generics
 --		sys_clock: System Input Clock Frequency (Hz)
@@ -34,7 +35,7 @@
 --		Input	-	i_reset: System Input Reset ('0': No Reset, '1': Reset)
 --		Input	-	i_spi_single_enable: Enable SPI Single Mode ('0': Disable, '1': Enable)
 --		Input	-	i_spi_dual_enable: Enable SPI Dual Mode ('0': Disable, '1': Enable)
---		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
+--		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 15 cycles)
 --		Output 	-	o_spi_freq: SPI Serial Clock Frequency
 --		Output 	-	o_using_sys_freq: System Input Clock as SPI Serial Clock Frequency ('0': Disable, '1': Enable)
 ------------------------------------------------------------------------
@@ -59,7 +60,7 @@ PORT(
 	i_reset: IN STD_LOGIC;
 	i_spi_single_enable: IN STD_LOGIC;
 	i_spi_dual_enable: IN STD_LOGIC;
-	i_dummy_cycles: IN INTEGER range 0 to 14;
+	i_dummy_cycles: IN INTEGER range 0 to 15;
 	o_spi_freq: OUT STD_LOGIC;
 	o_using_sys_freq: OUT STD_LOGIC
 );
@@ -71,7 +72,7 @@ signal reset: STD_LOGIC := '0';
 signal spi_single_enable: STD_LOGIC := '0';
 signal spi_dual_enable: STD_LOGIC := '0';
 signal dummy_cycle_clock: STD_LOGIC := '0';
-signal dummy_cycles: INTEGER range 0 to 14 := 0;
+signal dummy_cycles: INTEGER range 0 to 15 := 0;
 signal spi_freq: STD_LOGIC := '0';
 signal using_sys_freq: STD_LOGIC := '0';
 
@@ -94,7 +95,7 @@ begin
     if rising_edge(dummy_cycle_clock) then
 
         -- Reset Dummy Cycles
-        if (reset = '1') or (dummy_cycles = 14) then
+        if (reset = '1') or (dummy_cycles = 15) then
             dummy_cycles <= 0;
         
         -- New Dummy Cycles

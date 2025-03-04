@@ -19,14 +19,16 @@
 --		|   0  |   0  | Quad
 --		|   0  |   1  | Quad
 --		|   1  |   0  | Dual
---		|   1  |   1  | Single
+--		|   1  |   1  | Single (Default)
 --
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
+--		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
 --		Input 	-	i_command: Command Byte
+--		Input 	-	i_new_data_to_mem: New Data to Write on FLASH Ready (Write Mode) ('0': NOT Ready, '1': Ready)
 --		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
---		Output 	-	i_data_from_mem: Data Bytes Read from FLASH
---		Output 	-	i_data_from_mem_ready: Data Bytes Read from FLASH Ready (Read Mode) ('0': NOT Ready, '1': Ready)
+--		Input 	-	i_data_from_mem_ready: Data Bytes Read from FLASH Ready (Read Mode) ('0': NOT Ready, '1': Ready)
+--		Input 	-	i_data_from_mem: Data Bytes Read from FLASH
 --		Output 	-	o_spi_single_enable: SPI Single Mode Enable ('0': Disable, '1': Enable)
 --		Output 	-	o_spi_dual_enable: SPI Dual Mode Enable ('0': Disable, '1': Enable)
 --		Output 	-	o_spi_quad_enable: SPI Quad Mode Enable ('0': Disable, '1': Enable)
@@ -40,10 +42,12 @@ ENTITY PmodSF3SPIModes is
 
 PORT(
 	i_sys_clock: IN STD_LOGIC;
+	i_reset: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
-    i_data_to_mem: IN UNSIGNED(15 downto 0);
-    i_data_from_mem: IN UNSIGNED(15 downto 0);
+	i_new_data_to_mem: IN STD_LOGIC;
+    i_data_to_mem: IN UNSIGNED(7 downto 0);
 	i_data_from_mem_ready: IN STD_LOGIC;
+    i_data_from_mem: IN UNSIGNED(7 downto 0);
     o_spi_single_enable: OUT STD_LOGIC;
     o_spi_dual_enable: OUT STD_LOGIC;
     o_spi_quad_enable: OUT STD_LOGIC
@@ -80,6 +84,14 @@ constant SPI_QUAD_MODE: UNSIGNED(0 downto 0) := "0";
 ------------------------------------------------------------------------
 -- Signal Declarations
 ------------------------------------------------------------------------
+-- Non Volatile SPI Mode (Write mode)
+signal non_volatile_w_bit_counter: UNSIGNED(2 downto 0) := (others => '0');
+signal non_volatile_w_second_byte: STD_LOGIC := '0';
+
+-- Non Volatile SPI Mode (Read mode)
+signal non_volatile_r_byte_counter: UNSIGNED(0 downto 0) := (others => '0');
+signal non_volatile_r_second_byte: STD_LOGIC := '0';
+
 -- Non Volatile SPI Mode Register
 signal non_volatile_spi_mode_reg: UNSIGNED(1 downto 0) := (others => '0');
 
@@ -95,6 +107,46 @@ signal spi_mode_out_reg: UNSIGNED(1 downto 0) := (others => '0');
 ------------------------------------------------------------------------
 begin
 
+	----------------------------------------------
+	-- Non-Volatile Write Configuration Handler --
+	----------------------------------------------
+	process(i_sys_clock)
+	begin
+
+		if rising_edge(i_sys_clock) then
+
+			-- Reset Bit Counter
+			if (i_command /= WRITE_NON_VOLATILE_COMMAND) then
+				non_volatile_w_bit_counter <= (others => '1');
+			
+			-- Decrement Bit Counter
+			elsif (i_new_data_to_mem = '1') then
+				non_volatile_w_bit_counter <= non_volatile_w_bit_counter -1;
+			end if;
+		end if;
+	end process;
+	non_volatile_w_second_byte <= '1' when (non_volatile_w_bit_counter = "000") else '0';
+
+	----------------------------------------------
+	-- Non-Volatile Read Configuration Handler --
+	----------------------------------------------
+	process(i_sys_clock)
+	begin
+
+		if rising_edge(i_sys_clock) then
+
+			-- Reset Byte Counter
+			if (i_command /= READ_NON_VOLATILE_COMMAND) then
+				non_volatile_r_byte_counter <= (others => '1');
+			
+			-- Decrement Byte Counter
+			elsif (i_data_from_mem_ready = '1') then
+				non_volatile_r_byte_counter <= non_volatile_r_byte_counter -1;
+			end if;
+		end if;
+	end process;
+	non_volatile_r_second_byte <= '1' when (non_volatile_r_byte_counter = "0") else '0';
+
 	----------------------------------------
 	-- Non-Volatile Configuration Handler --
 	----------------------------------------
@@ -104,11 +156,11 @@ begin
 		if rising_edge(i_sys_clock) then
 
 			-- Write Non-Volatile Configuration Register
-			if (i_command = WRITE_NON_VOLATILE_COMMAND) then
+			if (i_command = WRITE_NON_VOLATILE_COMMAND) and (non_volatile_w_second_byte = '1') then
 				non_volatile_spi_mode_reg <= i_data_to_mem(NON_VOLATILE_CONFIG_REG_SPI_QUAD_BIT) & i_data_to_mem(NON_VOLATILE_CONFIG_REG_SPI_DUAL_BIT);
 
 			-- Read Non-Volatile Configuration Register
-			elsif (i_data_from_mem_ready = '1') and (i_command = READ_NON_VOLATILE_COMMAND) then
+			elsif (i_command = READ_NON_VOLATILE_COMMAND) and (i_data_from_mem_ready = '1') and (non_volatile_r_second_byte = '1') then
 				non_volatile_spi_mode_reg <= i_data_from_mem(NON_VOLATILE_CONFIG_REG_SPI_QUAD_BIT) & i_data_from_mem(NON_VOLATILE_CONFIG_REG_SPI_DUAL_BIT);
 			end if;
         end if;
@@ -148,8 +200,12 @@ begin
 	begin
 		if rising_edge(i_sys_clock) then
 
+			-- Reset
+			if (i_reset = '1') then
+				spi_mode_out_reg <= SPI_SINGLE_MODE;
+
 			-- Reset Memory Command (use Non-Volatile SPI Mode)
-			if (i_command = RESET_NON_VOLATILE_COMMAND) then
+			elsif (i_command = RESET_NON_VOLATILE_COMMAND) then
 				spi_mode_out_reg <= non_volatile_spi_mode_reg;
 
 			-- Write Enhanced Volatile Configuration Register (use Enhanced Volatile SPI Mode)

@@ -25,6 +25,7 @@
 --		| 	   12	   | 	133 	| 	 94    |   133    |
 --		| 	   13	   | 	133 	| 	 94    |   133    |
 --		| 	   14	   | 	133 	| 	 94    |   133    |
+--		| 	   15	   | 	133 	| 	 94    |   133    |
 --
 -- Generics
 --		sys_clock: System Input Clock Frequency (Hz)
@@ -34,7 +35,7 @@
 --		Input	-	i_reset: System Input Reset ('0': No Reset, '1': Reset)
 --		Input	-	i_spi_single_enable: Enable SPI Single Mode ('0': Disable, '1': Enable)
 --		Input	-	i_spi_dual_enable: Enable SPI Dual Mode ('0': Disable, '1': Enable)
---		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
+--		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 15 cycles)
 --		Output 	-	o_spi_freq: SPI Serial Clock Frequency
 --		Output 	-	o_using_sys_freq: System Input Clock as SPI Serial Clock Frequency ('0': Disable, '1': Enable)
 ------------------------------------------------------------------------
@@ -55,7 +56,7 @@ PORT(
 	i_reset: IN STD_LOGIC;
 	i_spi_single_enable: IN STD_LOGIC;
 	i_spi_dual_enable: IN STD_LOGIC;
-	i_dummy_cycles: IN INTEGER range 0 to 14;
+	i_dummy_cycles: IN INTEGER range 0 to 15;
 	o_spi_freq: OUT STD_LOGIC;
 	o_using_sys_freq: OUT STD_LOGIC
 );
@@ -68,7 +69,7 @@ ARCHITECTURE Behavioral of PmodSF3SPIFrequencyGenerator is
 -- Constant Declarations
 ------------------------------------------------------------------------
 -- ROM Type
-type ROM_TYPE is array(INTEGER range 0 to 14) of INTEGER;
+type ROM_TYPE is array(INTEGER range 0 to 15) of INTEGER;
 
 -- No SPI Frequency Divider (use System Input Clock Frequency)
 constant NO_SPI_DIVIDER: INTEGER := 0;
@@ -79,7 +80,7 @@ variable spi_freq: INTEGER;
 variable spi_freq_rom: ROM_TYPE;
 begin
 	
-	for index in INTEGER range 0 to 14 loop
+	for index in INTEGER range 0 to 15 loop
 		
 		-- Get SPI Single Mode Frequency from ROM Reference (in MHz)
 		spi_freq := rom_ref(index) * 1_000_000;
@@ -98,9 +99,9 @@ begin
 end spi_mode_rom_initialization;
 
 -- ROM Memories (Frequency Inputs in MHz)
-constant SINGLE_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 94, 112, 129, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133));
-constant DUAL_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (94, 79, 97, 106, 115, 125, 133, 94, 94, 94, 94, 94, 94, 94, 94));
-constant QUAD_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 44, 61, 78, 97, 106, 115, 125, 133, 133, 133, 133, 133, 133, 133));
+constant SINGLE_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 94, 112, 129, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133));
+constant DUAL_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (94, 79, 97, 106, 115, 125, 133, 94, 94, 94, 94, 94, 94, 94, 94, 94));
+constant QUAD_SPI_ROM: rom_type := spi_mode_rom_initialization(rom_ref => (133, 44, 61, 78, 97, 106, 115, 125, 133, 133, 133, 133, 133, 133, 133, 133));
 
 ------------------------------------------------------------------------
 -- Signal Declarations
@@ -111,8 +112,9 @@ signal spi_clock_div_ref: INTEGER := 0;
 -- SPI Clock Divider
 signal spi_clock_div: INTEGER := 0;
 
--- SPI Serial Clock Frequency Enable
+-- SPI Serial Clock Frequency
 signal spi_freq_enable: STD_LOGIC := '0';
+signal spi_freq_reg: STD_LOGIC := '0';
 
 ------------------------------------------------------------------------
 -- Module Implementation
@@ -160,9 +162,9 @@ begin
 		end if;
 	end process;
 
-	--------------------------------
-	-- SPI Serial Clock Frequency --
-	--------------------------------
+	-----------------------------
+	-- SPI Serial Clock Enable --
+	-----------------------------
 	process(i_sys_clock)
 	begin
 		if rising_edge(i_sys_clock) then
@@ -175,7 +177,25 @@ begin
 			end if;
 		end if;
 	end process;
-	o_spi_freq <= i_sys_clock when spi_freq_enable = '1' else '0';
+
+	--------------------------------
+	-- SPI Serial Clock Frequency --
+	--------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+	
+			-- Reset
+			if (i_reset = '1') or (spi_clock_div /= 0) then
+				spi_freq_reg <= '0';
+			
+			-- SPI Clock
+			else
+				spi_freq_reg <= i_sys_clock;
+			end if;
+		end if;
+	end process;
+	o_spi_freq <= spi_freq_reg;
 
 	------------------------------------------------------
 	-- System Input Clock as SPI Serial Clock Frequency --

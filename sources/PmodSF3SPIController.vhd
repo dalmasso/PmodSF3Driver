@@ -27,7 +27,7 @@
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_addr_bytes: Number of Address Bytes to use (0 to 3 bytes)
 --		Input 	-	i_addr: Address Bytes
---		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
+--		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 15 cycles)
 --		Input 	-	i_data_bytes: Number of Data Bytes to write
 --		Input 	-	i_data_w: Data Bytes to write
 --		Output 	-	o_next_data_w: Next bit of Data Bytes trigger ('0': Disable, '1': Enable)
@@ -60,7 +60,7 @@ PORT(
 	i_command: IN UNSIGNED(7 downto 0);
 	i_addr_bytes: IN INTEGER range 0 to 3;
 	i_addr: IN UNSIGNED(23 downto 0);
-	i_dummy_cycles: IN INTEGER range 0 to 14;
+	i_dummy_cycles: IN INTEGER range 0 to 15;
 	i_data_bytes: IN INTEGER;
 	i_data_w: IN UNSIGNED(7 downto 0);
 	o_next_data_w: OUT STD_LOGIC;
@@ -133,7 +133,7 @@ signal data_bytes_reg: INTEGER := 0;
 signal data_w_reg: UNSIGNED(SPI_WRITE_REGISTER_LENGTH-1 downto 0) := (others => '0');
 
 -- Number of Dummy Cycles
-signal dummy_cycles_reg: INTEGER range 0 to 14 := 0;
+signal dummy_cycles_reg: INTEGER range 0 to 15 := 0;
 
 -- Data from Memory
 signal data_r_reg: UNSIGNED(7 downto 0) := (others => '0');
@@ -528,28 +528,31 @@ begin
 			if (i_sys_clock_en = '1') then
 				
 				-- Next Data to Write on SCLK Rising Edge (Left-Shift Data Read Register & new SPI Data Input)
-				if (sclk_rising_edge = '1') and (mem_mode_reg = MEM_READ_MODE) and (state = BYTES_TXRX) and (bit_counter_end = '0') then
+				if (sclk_rising_edge = '1') and (mem_mode_reg = MEM_READ_MODE) and (state = BYTES_TXRX) then
 
-					-- Single SPI Mode: DQ1
-					if (spi_single_enable_reg = '1') then
-						data_r_reg(7 downto 1) <= data_r_reg(6 downto 0);
-						data_r_reg(0) <= io_dq(1);
+					-- Check Last Byte Cycle					
+					if (data_bytes_reg /= 1) or (bit_counter_end = '0') then
 
-					-- Dual SPI Mode: DQ[1:0]
-					elsif (spi_dual_enable_reg = '1')  then
-						data_r_reg(7 downto 2) <= data_r_reg(5 downto 0);
-						data_r_reg(1) <= io_dq(1);
-						data_r_reg(0) <= io_dq(0);
+						-- Single SPI Mode: DQ1
+						if (spi_single_enable_reg = '1') then
+							data_r_reg(7 downto 1) <= data_r_reg(6 downto 0);
+							data_r_reg(0) <= io_dq(1);
 
-					-- Quad SPI Mode: DQ[3:0]
-					else
-						data_r_reg(7 downto 4) <= data_r_reg(3 downto 0);
-						data_r_reg(3) <= io_dq(3);
-						data_r_reg(2) <= io_dq(2);
-						data_r_reg(1) <= io_dq(1);
-						data_r_reg(0) <= io_dq(0);
+						-- Dual SPI Mode: DQ[1:0]
+						elsif (spi_dual_enable_reg = '1')  then
+							data_r_reg(7 downto 2) <= data_r_reg(5 downto 0);
+							data_r_reg(1) <= io_dq(1);
+							data_r_reg(0) <= io_dq(0);
+
+						-- Quad SPI Mode: DQ[3:0]
+						else
+							data_r_reg(7 downto 4) <= data_r_reg(3 downto 0);
+							data_r_reg(3) <= io_dq(3);
+							data_r_reg(2) <= io_dq(2);
+							data_r_reg(1) <= io_dq(1);
+							data_r_reg(0) <= io_dq(0);
+						end if;
 					end if;
-
 				end if;
 			end if;
 		end if;
@@ -563,15 +566,18 @@ begin
 	begin
 		if rising_edge(i_sys_clock) then
 
-			-- Enable Read Data Valid (End of Read Cycle)
-			if (mem_mode_reg = MEM_READ_MODE) and (state = STOP_TX) then
-				data_r_ready_reg <= '1';
+			-- Clock Enable
+			if (i_sys_clock_en = '1') then
 
-			-- Disable Read Data Valid (New cycle)
-			elsif (state = WRITE_CMD) then
-				data_r_ready_reg <= '0';
+				-- Data Read Ready
+				if (mem_mode_reg = MEM_READ_MODE) and (state = BYTES_TXRX) and (bit_counter_end = '1') then
+					data_r_ready_reg <= '1';
+
+				-- Data Read NOT Ready
+				else
+					data_r_ready_reg <= '0';
+				end if;
 			end if;
-
 		end if;
 	end process;
 	o_data_ready <= data_r_ready_reg;

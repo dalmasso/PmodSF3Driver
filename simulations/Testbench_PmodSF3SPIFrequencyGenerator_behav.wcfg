@@ -10,12 +10,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="166.666 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,166.667 ns"></ZoomEndTime>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,880.001 ns"></ZoomEndTime>
       <Cursor1Time time="1,000.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="152"></NameColumnWidth>
+      <NameColumnWidth column_width="148"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
@@ -36,16 +36,16 @@
       <obj_property name="ObjectShortName">i_spi_dual_enable</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIFrequencyGenerator/uut/SINGLE_SPI_ROM">
-      <obj_property name="ElementShortName">SINGLE_SPI_ROM[0:14]</obj_property>
-      <obj_property name="ObjectShortName">SINGLE_SPI_ROM[0:14]</obj_property>
+      <obj_property name="ElementShortName">SINGLE_SPI_ROM[0:15]</obj_property>
+      <obj_property name="ObjectShortName">SINGLE_SPI_ROM[0:15]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIFrequencyGenerator/uut/DUAL_SPI_ROM">
-      <obj_property name="ElementShortName">DUAL_SPI_ROM[0:14]</obj_property>
-      <obj_property name="ObjectShortName">DUAL_SPI_ROM[0:14]</obj_property>
+      <obj_property name="ElementShortName">DUAL_SPI_ROM[0:15]</obj_property>
+      <obj_property name="ObjectShortName">DUAL_SPI_ROM[0:15]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIFrequencyGenerator/uut/QUAD_SPI_ROM">
-      <obj_property name="ElementShortName">QUAD_SPI_ROM[0:14]</obj_property>
-      <obj_property name="ObjectShortName">QUAD_SPI_ROM[0:14]</obj_property>
+      <obj_property name="ElementShortName">QUAD_SPI_ROM[0:15]</obj_property>
+      <obj_property name="ObjectShortName">QUAD_SPI_ROM[0:15]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIFrequencyGenerator/dummy_cycle_clock">
       <obj_property name="ElementShortName">dummy_cycle_clock</obj_property>
