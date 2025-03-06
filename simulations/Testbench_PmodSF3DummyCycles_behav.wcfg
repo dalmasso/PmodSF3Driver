@@ -11,17 +11,21 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,097.766 ns"></ZoomEndTime>
-      <Cursor1Time time="0.000 ns"></Cursor1Time>
+      <ZoomEndTime time="186.401 ns"></ZoomEndTime>
+      <Cursor1Time time="35.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="160"></NameColumnWidth>
+      <NameColumnWidth column_width="156"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="28" />
+   <WVObjectSize size="26" />
    <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/sys_clock">
       <obj_property name="ElementShortName">sys_clock</obj_property>
       <obj_property name="ObjectShortName">sys_clock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/sys_clock_2">
+      <obj_property name="ElementShortName">sys_clock_2</obj_property>
+      <obj_property name="ObjectShortName">sys_clock_2</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/reset">
       <obj_property name="ElementShortName">reset</obj_property>
@@ -75,25 +79,9 @@
       <obj_property name="ElementShortName">i_data_to_mem[7:0]</obj_property>
       <obj_property name="ObjectShortName">i_data_to_mem[7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_w_bit_counter">
-      <obj_property name="ElementShortName">non_volatile_w_bit_counter[2:0]</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_w_bit_counter[2:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_w_first_byte">
-      <obj_property name="ElementShortName">non_volatile_w_first_byte</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_w_first_byte</obj_property>
-   </wvobject>
    <wvobject fp_name="divider36" type="divider">
       <obj_property name="label">Read</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_r_byte_counter">
-      <obj_property name="ElementShortName">non_volatile_r_byte_counter[0:0]</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_r_byte_counter[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_r_first_byte">
-      <obj_property name="ElementShortName">non_volatile_r_first_byte</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_r_first_byte</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/i_data_from_mem_ready">
       <obj_property name="ElementShortName">i_data_from_mem_ready</obj_property>
@@ -107,9 +95,17 @@
       <obj_property name="label">Internal Regs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_first_byte">
+      <obj_property name="ElementShortName">non_volatile_first_byte</obj_property>
+      <obj_property name="ObjectShortName">non_volatile_first_byte</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3DummyCycles/uut/non_volatile_dummy_cycles_reg">
       <obj_property name="ElementShortName">non_volatile_dummy_cycles_reg[3:0]</obj_property>
       <obj_property name="ObjectShortName">non_volatile_dummy_cycles_reg[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/volatile_first_byte">
+      <obj_property name="ElementShortName">volatile_first_byte</obj_property>
+      <obj_property name="ObjectShortName">volatile_first_byte</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3DummyCycles/uut/volatile_dummy_cycles_reg">
       <obj_property name="ElementShortName">volatile_dummy_cycles_reg[3:0]</obj_property>
@@ -122,10 +118,6 @@
    <wvobject type="logic" fp_name="/Testbench_PmodSF3DummyCycles/uut/apply_volatile_dummy_cycles">
       <obj_property name="ElementShortName">apply_volatile_dummy_cycles</obj_property>
       <obj_property name="ObjectShortName">apply_volatile_dummy_cycles</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3DummyCycles/uut/dummy_cycles_out_reg">
-      <obj_property name="ElementShortName">dummy_cycles_out_reg[3:0]</obj_property>
-      <obj_property name="ObjectShortName">dummy_cycles_out_reg[3:0]</obj_property>
    </wvobject>
    <wvobject type="other" fp_name="/Testbench_PmodSF3DummyCycles/dummy_cycles">
       <obj_property name="ElementShortName">dummy_cycles</obj_property>

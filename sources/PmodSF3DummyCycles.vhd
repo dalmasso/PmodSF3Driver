@@ -12,6 +12,7 @@
 --
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
+--		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_new_data_to_mem: New Data to Write on FLASH Ready (Write Mode) ('0': NOT Ready, '1': Ready)
 --		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
@@ -28,6 +29,7 @@ ENTITY PmodSF3DummyCycles is
 
 PORT(
 	i_sys_clock: IN STD_LOGIC;
+	i_reset: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
@@ -59,16 +61,14 @@ constant DUMMY_CYCLES_LSB_BIT: INTEGER := 4;
 ------------------------------------------------------------------------
 -- Signal Declarations
 ------------------------------------------------------------------------
--- Non Volatile Dummy Cycles (Write mode)
-signal non_volatile_w_bit_counter: UNSIGNED(2 downto 0) := (others => '0');
-signal non_volatile_w_first_byte: STD_LOGIC := '0';
-
--- Non Volatile Dummy Cycles (Read mode)
-signal non_volatile_r_byte_counter: UNSIGNED(0 downto 0) := (others => '0');
-signal non_volatile_r_first_byte: STD_LOGIC := '0';
+-- Non Volatile Dummy Cycles Byte
+signal non_volatile_first_byte: STD_LOGIC := '0';
 
 -- Non Volatile Dummy Cycles Register
 signal non_volatile_dummy_cycles_reg: UNSIGNED(3 downto 0) := (others => '0');
+
+-- Volatile Dummy Cycles Byte
+signal volatile_first_byte: STD_LOGIC := '0';
 
 -- Volatile Dummy Cycles Register
 signal volatile_dummy_cycles_reg: UNSIGNED(3 downto 0) := (others => '0');
@@ -82,81 +82,100 @@ signal dummy_cycles_out_reg: UNSIGNED(3 downto 0) := (others => '0');
 ------------------------------------------------------------------------
 begin
 
-	----------------------------------------------
-	-- Non-Volatile Write Configuration Handler --
-	----------------------------------------------
+	--------------------------------------------------------
+	-- Non-Volatile Read/Write Byte Configuration Handler --
+	--------------------------------------------------------
 	process(i_sys_clock)
 	begin
-
 		if rising_edge(i_sys_clock) then
 
-			-- Reset Bit Counter
-			if (i_command /= WRITE_NON_VOLATILE_COMMAND) then
-				non_volatile_w_bit_counter <= (others => '0');
+			-- First Byte to Read/Write
+			if (i_reset = '1') then
+				non_volatile_first_byte <= '1';
 			
-			-- Increment Bit Counter
-			elsif (i_new_data_to_mem = '1') then
-				non_volatile_w_bit_counter <= non_volatile_w_bit_counter +1;
+			-- Next Byte to Write
+			elsif (i_command = WRITE_NON_VOLATILE_COMMAND) and (i_new_data_to_mem = '1') then
+				non_volatile_first_byte <= '0';
+			
+			-- Next Byte to Read
+			elsif (i_command = READ_NON_VOLATILE_COMMAND) and (i_data_from_mem_ready = '1') then
+				non_volatile_first_byte <= '0';
 			end if;
 		end if;
 	end process;
-	non_volatile_w_first_byte <= '1' when (non_volatile_w_bit_counter = "000") else '0';
-
-	----------------------------------------------
-	-- Non-Volatile Read Configuration Handler --
-	----------------------------------------------
-	process(i_sys_clock)
-	begin
-
-		if rising_edge(i_sys_clock) then
-
-			-- Reset Byte Counter
-			if (i_command /= READ_NON_VOLATILE_COMMAND) then
-				non_volatile_r_byte_counter <= (others => '0');
-			
-			-- Increment Byte Counter
-			elsif (i_data_from_mem_ready = '1') then
-				non_volatile_r_byte_counter <= non_volatile_r_byte_counter +1;
-			end if;
-		end if;
-	end process;
-	non_volatile_r_first_byte <= '1' when (non_volatile_r_byte_counter = "0") else '0';
 
 	----------------------------------------
 	-- Non-Volatile Configuration Handler --
 	----------------------------------------
 	process(i_sys_clock)
 	begin
-
 		if rising_edge(i_sys_clock) then
 
-			-- Write Non-Volatile Configuration Register
-			if (i_command = WRITE_NON_VOLATILE_COMMAND) and (non_volatile_w_first_byte = '1') then
-				non_volatile_dummy_cycles_reg <= i_data_to_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+			-- First Byte to Read/Write
+			if (non_volatile_first_byte = '1') then
+				
+				-- Write Non-Volatile Configuration Register
+				if (i_command = WRITE_NON_VOLATILE_COMMAND) then
+					non_volatile_dummy_cycles_reg <= i_data_to_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
 
-			-- Read Non-Volatile Configuration Register
-			elsif (i_command = READ_NON_VOLATILE_COMMAND) and (i_data_from_mem_ready = '1') and (non_volatile_r_first_byte = '1') then
-				non_volatile_dummy_cycles_reg <= i_data_from_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+				-- Read Non-Volatile Configuration Register
+				elsif (i_command = READ_NON_VOLATILE_COMMAND) then
+					non_volatile_dummy_cycles_reg <= i_data_from_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+				end if;
 			end if;
         end if;
     end process;
+
+	----------------------------------------------------
+	-- Volatile Read/Write Byte Configuration Handler --
+	----------------------------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+
+			-- First Byte to Read/Write
+			if (i_reset = '1') then
+				volatile_first_byte <= '1';
+			
+			-- Next Byte to Write
+			elsif (i_command = WRITE_VOLATILE_CONFIG_COMMAND) and (i_new_data_to_mem = '1') then
+				volatile_first_byte <= '0';
+			
+			-- Next Byte to Read
+			elsif (i_command = READ_VOLATILE_CONFIG_COMMAND) and (i_data_from_mem_ready = '1') then
+				volatile_first_byte <= '0';
+			end if;
+		end if;
+	end process;
 
 	------------------------------------
 	-- Volatile Configuration Handler --
 	------------------------------------
 	process(i_sys_clock)
 	begin
-
 		if rising_edge(i_sys_clock) then
 
-			-- Write Volatile Configuration Register
-			if (i_command = WRITE_VOLATILE_CONFIG_COMMAND) then
-				volatile_dummy_cycles_reg <= i_data_to_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+			-- First Byte to Read/Write
+			if (volatile_first_byte = '1') then
+				
+				-- Write Non-Volatile Configuration Register
+				if (i_command = WRITE_VOLATILE_CONFIG_COMMAND) then
+					volatile_dummy_cycles_reg <= i_data_to_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
 
-			-- Read Volatile Configuration Register
-			elsif (i_data_from_mem_ready = '1') and (i_command = READ_VOLATILE_CONFIG_COMMAND) then
-				volatile_dummy_cycles_reg <= i_data_from_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+				-- Read Non-Volatile Configuration Register
+				elsif (i_command = READ_VOLATILE_CONFIG_COMMAND) then
+					volatile_dummy_cycles_reg <= i_data_from_mem(DUMMY_CYCLES_MSB_BIT downto DUMMY_CYCLES_LSB_BIT);
+				end if;
 			end if;
+        end if;
+    end process;
+
+	--------------------------------------
+	-- Apply New Volatile Configuration --
+	--------------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
 
 			-- Apply New Volatile Configuration Register to Output Register
             if (i_command = WRITE_VOLATILE_CONFIG_COMMAND) then

@@ -12,6 +12,7 @@
 --
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
+--		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_new_data_to_mem: New Data to Write on FLASH Ready (Write Mode) ('0': NOT Ready, '1': Ready)
 --		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
@@ -33,6 +34,7 @@ COMPONENT PmodSF3DummyCycles is
 
 PORT(
 	i_sys_clock: IN STD_LOGIC;
+    i_reset: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
@@ -44,12 +46,13 @@ PORT(
 END COMPONENT;
 
 signal sys_clock: STD_LOGIC := '0';
+signal sys_clock_2: STD_LOGIC := '0';
 signal reset: STD_LOGIC := '0';
 signal command: UNSIGNED(7 downto 0) := (others => '0');
 signal new_data_to_mem: STD_LOGIC := '0';
-signal data_to_mem: UNSIGNED(7 downto 0) := (others => '0');
+signal data_to_mem: UNSIGNED(7 downto 0) := x"AB";
 signal data_from_mem_ready: STD_LOGIC := '0';
-signal data_from_mem: UNSIGNED(7 downto 0) := (others => '0');
+signal data_from_mem: UNSIGNED(7 downto 0) := x"CD";
 signal dummy_cycles: INTEGER range 0 to 15 := 0;
 
 begin
@@ -57,21 +60,32 @@ begin
 -- Clock 100 MHz
 sys_clock <= not(sys_clock) after 5 ns;
 
+-- Command Clock
+process
+begin
+    sys_clock_2 <= not(sys_clock_2) after 5 ns;
+    wait for 20 ns;
+end process;
+
 -- Reset
-reset <= '1', '0' after 145 ns;
+reset <=    '1', '0' after 145 ns,
+            -- Reset after Write Volatile
+            '1' after 5.205 us, '0' after 5.245 us,
+            -- Reset after Write Non Volatile
+            '1' after 7.125 us, '0' after 7.165 us;
 
 -- Command
-process(sys_clock)
+process(sys_clock_2)
 begin
-    if rising_edge(sys_clock) then
-        
-        -- Reset Command
-        if (reset = '1') then
-            command <= (others => '0');
-        
+    if rising_edge(sys_clock_2) then
+
         -- Increment Command
-        elsif (command < 0x"B1") then
+        if (command < "11111111") then
             command <= command +1;
+        
+        -- Apply Non Volatile Dummy Cycle Register
+        else
+            command <= x"99";
         end if;
     end if;
 end process;
@@ -81,11 +95,11 @@ process(sys_clock)
 begin
     if rising_edge(sys_clock) then
         
-        -- Reset Data to Memory
+        -- No Data to Memory
         if (reset = '1') then
             new_data_to_mem <= '0';
         
-        -- Increment Data to Memory
+        -- New Data to Memory
         else
             new_data_to_mem <= '1';
         end if;
@@ -97,45 +111,33 @@ process(sys_clock)
 begin
     if rising_edge(sys_clock) then
         
-        -- Reset Data to Memory
-        if (reset = '1') then
-            data_to_mem <= (others => '0');
-        
         -- Increment Data to Memory
-        elsif(data_to_mem < "11111111") then
-            data_to_mem <= data_to_mem +1;
-            
-        end if;
+        data_to_mem <= data_to_mem +1;
+
     end if;
 end process;
 
 -- Data from Memory Ready
 data_from_mem_ready <=  '0',
                         '1' after 1.105 us, '0' after 1.175 us,
-                        '1' after 1.465 us, '0' after 1.535 us,
-                        '1' after 1.945 us, '0' after 2 us,
-                        '1' after 233 us, '0' after 280 us,
-                        '1' after 656.825 us, '0' after 656.845 us;
+                        '1' after 5.285 us, '0' after 5.325 us,
+                        '1' after 7.205 us, '0' after 7.245 us;
 
 -- Data from Memory for Test
 process(sys_clock)
 begin
     if rising_edge(sys_clock) then
-        
-        -- Reset Data to Memory
-        if (reset = '1') then
-            data_from_mem <= (others => '1');
-        
-        -- Increment Data to Memory
-        elsif (data_from_mem > "00000000") then
-            data_from_mem <= data_from_mem -1;
-        end if;
+
+        -- Decrement Data to Memory
+        data_from_mem <= data_from_mem -1;
+
     end if;
 end process;
 
 uut: PmodSF3DummyCycles
     PORT map(
         i_sys_clock => sys_clock,
+        i_reset => reset,
         i_command => command,
         i_new_data_to_mem => new_data_to_mem,
 		i_data_to_mem => data_to_mem,
