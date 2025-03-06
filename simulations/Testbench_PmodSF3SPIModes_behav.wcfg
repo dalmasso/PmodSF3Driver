@@ -10,22 +10,30 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="388.424 ns"></ZoomEndTime>
-      <Cursor1Time time="102.483 ns"></Cursor1Time>
+      <ZoomStartTime time="40,550.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="40,990.501 ns"></ZoomEndTime>
+      <Cursor1Time time="40,815.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="190"></NameColumnWidth>
-      <ValueColumnWidth column_width="87"></ValueColumnWidth>
+      <ValueColumnWidth column_width="83"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="33" />
+   <WVObjectSize size="35" />
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/sys_clock">
       <obj_property name="ElementShortName">sys_clock</obj_property>
       <obj_property name="ObjectShortName">sys_clock</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/sys_clock_2">
+      <obj_property name="ElementShortName">sys_clock_2</obj_property>
+      <obj_property name="ObjectShortName">sys_clock_2</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/reset">
       <obj_property name="ElementShortName">reset</obj_property>
       <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/i_end_of_tx">
+      <obj_property name="ElementShortName">i_end_of_tx</obj_property>
+      <obj_property name="ObjectShortName">i_end_of_tx</obj_property>
    </wvobject>
    <wvobject fp_name="divider74" type="divider">
       <obj_property name="label">NON Volatile</obj_property>
@@ -75,14 +83,6 @@
       <obj_property name="ElementShortName">i_data_to_mem[7:0]</obj_property>
       <obj_property name="ObjectShortName">i_data_to_mem[7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_w_bit_counter">
-      <obj_property name="ElementShortName">non_volatile_w_bit_counter[2:0]</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_w_bit_counter[2:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_w_second_byte">
-      <obj_property name="ElementShortName">non_volatile_w_second_byte</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_w_second_byte</obj_property>
-   </wvobject>
    <wvobject fp_name="divider80" type="divider">
       <obj_property name="label">Read</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -95,21 +95,29 @@
       <obj_property name="ElementShortName">i_data_from_mem[7:0]</obj_property>
       <obj_property name="ObjectShortName">i_data_from_mem[7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_r_byte_counter">
-      <obj_property name="ElementShortName">non_volatile_r_byte_counter[0:0]</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_r_byte_counter[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_r_second_byte">
-      <obj_property name="ElementShortName">non_volatile_r_second_byte</obj_property>
-      <obj_property name="ObjectShortName">non_volatile_r_second_byte</obj_property>
-   </wvobject>
    <wvobject fp_name="divider89" type="divider">
       <obj_property name="label">Internal Regs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_bit_counter">
+      <obj_property name="ElementShortName">non_volatile_bit_counter[3:0]</obj_property>
+      <obj_property name="ObjectShortName">non_volatile_bit_counter[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_first_byte">
+      <obj_property name="ElementShortName">non_volatile_first_byte</obj_property>
+      <obj_property name="ObjectShortName">non_volatile_first_byte</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_second_byte">
+      <obj_property name="ElementShortName">non_volatile_second_byte</obj_property>
+      <obj_property name="ObjectShortName">non_volatile_second_byte</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIModes/uut/non_volatile_spi_mode_reg">
       <obj_property name="ElementShortName">non_volatile_spi_mode_reg[1:0]</obj_property>
       <obj_property name="ObjectShortName">non_volatile_spi_mode_reg[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIModes/uut/enhanced_volatile_first_byte">
+      <obj_property name="ElementShortName">enhanced_volatile_first_byte</obj_property>
+      <obj_property name="ObjectShortName">enhanced_volatile_first_byte</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIModes/uut/enhanced_volatile_spi_mode_reg">
       <obj_property name="ElementShortName">enhanced_volatile_spi_mode_reg[1:0]</obj_property>
