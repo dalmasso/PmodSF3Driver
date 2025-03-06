@@ -105,26 +105,36 @@ reset <= '1', '0' after 145 ns;
 start <= '0',
         -- Read then Write Cycles (SPI Single Mode)
         '1' after 200 ns, '0' after 326 ns,
-        '1' after 2505 ns, '0' after 2631 ns;
+        '1' after 2505 ns, '0' after 2631 ns,
+        -- 2 Dummy Cycles (Volatile)
+        '1' after 5020 ns, '0' after 5100 ns;
 
 -- Memory Operation Mode (Read then Write)
 mode <= -- SPI Single Mode
         '1', '0' after 500 ns;
 
 -- Command
-command <= x"A2";
+command <=  x"A2",
+            -- 2 Dummy Cycles (Volatile)
+            x"81" after 5000 ns;
+
 
 -- Address Bytes
-addr_bytes <= 3;
-
+addr_bytes <=   3,
+                -- 2 Dummy Cycles (Volatile)
+                0 after 5000 ns;
 -- Address
 addr <= x"123456";
 
 -- Data Bytes
-data_bytes <= 2;
+data_bytes <=   2,
+                -- 2 Dummy Cycles (Volatile)
+                1 after 5000 ns;
 
 -- Data to Write
-data_w <= x"8B";
+data_w <=   x"8B",
+            -- 2 Dummy Cycles (Volatile)
+            "00101011" after 5000 ns;
 
 -- SPI DQ[3:0]
 dq <= (others => 'Z'),

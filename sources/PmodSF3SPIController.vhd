@@ -81,7 +81,7 @@ ARCHITECTURE Behavioral of PmodSF3SPIController is
 ------------------------------------------------------------------------
 -- Constant Declarations
 ------------------------------------------------------------------------
--- SPI Write Register Length
+-- SPI Write Register Length: Command (1 Byte) + Address (3 Bytes) + Data (1 Byte)
 constant SPI_WRITE_REGISTER_LENGTH: INTEGER := 40;
 
 -- SPI Write Register Indexes
@@ -102,9 +102,10 @@ constant SPI_DQ_IDLE: STD_LOGIC := 'Z';
 constant DISABLE_SS_BIT: STD_LOGIC := '1';
 
 -- SPI Bit Counter Increment
-signal SPI_BIT_COUNTER_INCREMENT_1: UNSIGNED(2 downto 0) := "001";
-signal SPI_BIT_COUNTER_INCREMENT_2: UNSIGNED(2 downto 0) := "010";
-signal SPI_BIT_COUNTER_INCREMENT_4: UNSIGNED(2 downto 0) := "100";
+constant SPI_BIT_COUNTER_END: UNSIGNED(2 downto 0) := "111";
+constant SPI_BIT_COUNTER_INCREMENT_1: UNSIGNED(2 downto 0) := "001";
+constant SPI_BIT_COUNTER_INCREMENT_2: UNSIGNED(2 downto 0) := "010";
+constant SPI_BIT_COUNTER_INCREMENT_4: UNSIGNED(2 downto 0) := "100";
 
 -- Memory Read Mode
 constant MEM_READ_MODE: STD_LOGIC := '1';
@@ -129,7 +130,7 @@ signal mem_mode_reg: STD_LOGIC := '0';
 signal addr_bytes_reg: INTEGER range 0 to 3 := 0;
 signal data_bytes_reg: INTEGER := 0;
 
--- Data to Memory: Command (1 Byte) + Address (3 Bytes) + Data (1 Byte)
+-- Data to Memory
 signal data_w_reg: UNSIGNED(SPI_WRITE_REGISTER_LENGTH-1 downto 0) := (others => '0');
 
 -- Number of Dummy Cycles
@@ -140,7 +141,7 @@ signal data_r_reg: UNSIGNED(7 downto 0) := (others => '0');
 signal data_r_ready_reg: STD_LOGIC := '0';
 
 -- SPI Transmission Bit Counter
-signal bit_counter: UNSIGNED(3 downto 0) := (others => '0');
+signal bit_counter: UNSIGNED(2 downto 0) := (others => '0');
 signal bit_counter_increment: UNSIGNED(2 downto 0) := (others => '0');
 signal bit_counter_end: STD_LOGIC := '0';
 
@@ -346,20 +347,24 @@ begin
 						data_w_reg(SPI_WRITE_REGISTER_ADDR_DATA_MSB downto 0) <= i_data_w & EMPTY_WRITE_BITS;
 					end if;
 
-				-- Next Data to Write on SCLK Falling Edge (Left-Shift Data Write Register & new Data Input)
-				elsif (sclk_falling_edge = '1') and ((state = WRITE_CMD) or (state = WRITE_ADDR) or (state = BYTES_TXRX)) then
+				-- Handle Next Data to Write (Left-Shift Data Write Register & new Data Input)
+				elsif (state = WRITE_CMD) or (state = WRITE_ADDR) or (state = BYTES_TXRX) then
 
-					-- Single SPI Mode: DQ0
-					if (spi_single_enable_reg = '1') then
-						data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-2 downto 0) & i_data_w(7);
-					
-					-- Dual SPI Mode: DQ[1:0]
-					elsif (spi_dual_enable_reg = '1') then
-						data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-3 downto 0) & i_data_w(7 downto 6);
-					
-					-- Quad SPI Mode: DQ[3:0]
-					else
-						data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-5 downto 0) & i_data_w(7 downto 4);
+					-- Next Data to Write on SCLK Falling Edge
+					if (sclk_falling_edge = '1') and (addr_bytes_reg /= 0) and (data_bytes_reg /= 0) then
+
+						-- Single SPI Mode: DQ0
+						if (spi_single_enable_reg = '1') then
+							data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-2 downto 0) & i_data_w(7);
+						
+						-- Dual SPI Mode: DQ[1:0]
+						elsif (spi_dual_enable_reg = '1') then
+							data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-3 downto 0) & i_data_w(7 downto 6);
+						
+						-- Quad SPI Mode: DQ[3:0]
+						else
+							data_w_reg <= data_w_reg(SPI_WRITE_REGISTER_LENGTH-5 downto 0) & i_data_w(7 downto 4);
+						end if;
 					end if;
 				end if;
 			end if;
@@ -468,19 +473,36 @@ begin
 				end if;
 
 				-- Reset Bit Counter
-				if (state = IDLE) or (state = DUMMY_CYCLES) or (bit_counter_end = '1') then
+				if (state = IDLE) or (state = DUMMY_CYCLES) then
 					bit_counter <= (others => '0');
-
-				-- Increment Bit Counter (only at SCLK Edge)
+				
+				-- Increment Bit Counter (only at SCLK Falling Edge)
 				elsif (sclk_falling_edge = '1') then
-						bit_counter <= bit_counter +bit_counter_increment;			
+					bit_counter <= bit_counter +bit_counter_increment;			
 				end if;
 			end if;
 		end if;
 	end process;
 
 	-- Bit Counter End
-	bit_counter_end <= bit_counter(3);
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+
+			-- Clock Enable
+			if (i_sys_clock_en = '1') then
+				
+				-- Bit Counter End Trigger (only at SCLK Rising Edge)
+				if (sclk_rising_edge = '1') and (bit_counter = SPI_BIT_COUNTER_END) then
+					bit_counter_end <= '1';
+				
+				-- Reset Bit Counter End
+				else
+					bit_counter_end <= '0';
+				end if;
+			end if;
+		end if;
+	end process;
 
 	---------------------------
 	-- SPI Write Data (MOSI) --
