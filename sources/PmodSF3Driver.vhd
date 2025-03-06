@@ -129,6 +129,7 @@ COMPONENT PmodSF3DummyCycles is
 
 PORT(
 	i_sys_clock: IN STD_LOGIC;
+	i_reset: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
@@ -144,6 +145,7 @@ COMPONENT PmodSF3SPIModes is
 PORT(
 	i_sys_clock: IN STD_LOGIC;
 	i_reset: IN STD_LOGIC;
+	i_end_of_tx: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
@@ -361,6 +363,7 @@ begin
 	inst_PmodSF3DummyCycles: PmodSF3DummyCycles
 		PORT map (
 			i_sys_clock => i_sys_clock,
+			i_reset => spi_ready,
 			i_command => i_command,
 			i_new_data_to_mem => next_data_sig,
 			i_data_to_mem => data_w_reg(DATA_HIGH_BIT_MSB downto DATA_HIGH_BIT_LSB),
@@ -375,6 +378,7 @@ begin
 		PORT map (
 			i_sys_clock => i_sys_clock,
 			i_reset => i_reset,
+			i_end_of_tx => spi_ready,
 			i_command => i_command,
 			i_new_data_to_mem => next_data_sig,
 			i_data_to_mem => data_w_reg(DATA_HIGH_BIT_MSB downto DATA_HIGH_BIT_LSB),
