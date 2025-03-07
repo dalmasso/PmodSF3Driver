@@ -151,58 +151,58 @@ addr_bytes <= 3;
 addr <= x"123456";
 
 -- Dummy Cycles
-dummy_cycles <= 1;
+dummy_cycles <= 0, 3 after 5000 ns;
 
 -- Data Bytes
-data_bytes <= 2;
+data_bytes <= 2;        
 
 -- Data to Write
-data_w <= x"8B";
+data_w <= x"8B", x"EF" after 5000 ns, x"B0" after 8000 ns;
 
 -- SPI DQ[3:0]
 dq <= (others => 'Z'),
         -- Read then Write (SPI Single Mode)
         -- Byte 1 (0xAD)
-        "0010" after 875 ns,
-        "0000" after 895 ns,
-        "0010" after 915 ns,
-        "0000" after 935 ns,
+        "0010" after 855 ns,
+        "0000" after 875 ns,
+        "0010" after 895 ns,
+        "0000" after 915 ns,
+        "0010" after 935 ns,
         "0010" after 955 ns,
-        "0010" after 975 ns,
-        "0000" after 995 ns,
-        "0010" after 1015 ns,
+        "0000" after 975 ns,
+        "0010" after 995 ns,
         -- Byte 2 (0xF1)
+        "0010" after 1015 ns,
         "0010" after 1035 ns,
         "0010" after 1055 ns,
         "0010" after 1075 ns,
-        "0010" after 1095 ns,
+        "0000" after 1095 ns,
         "0000" after 1115 ns,
         "0000" after 1135 ns,
-        "0000" after 1155 ns,
-        "0010" after 1175 ns,
-        (others => 'Z') after 1195 ns,
+        "0010" after 1155 ns,
+        (others => 'Z') after 1175 ns,
 
         -- Read then Write (SPI Dual Mode)
         -- Byte 1 (0x9C)
-        "0010" after 5355 ns,
-        "0001" after 5375 ns,
-        "0011" after 5395 ns,
-        "0000" after 5415 ns,
+        "0010" after 5395 ns,
+        "0001" after 5415 ns,
+        "0011" after 5435 ns,
+        "0000" after 5455 ns,
         -- Byte 2 (0x9C)
-        "0010" after 5435 ns,
-        "0001" after 5455 ns,
-        "0011" after 5475 ns,
-        "0000" after 5495 ns,
-        (others => 'Z') after 5515 ns,
+        "0010" after 5475 ns,
+        "0001" after 5495 ns,
+        "0011" after 5515 ns,
+        "0000" after 5535 ns,
+        (others => 'Z') after 5555 ns,
 
         -- Read then Write (SPI Quad Mode)
         -- Byte 1 (0xD5)
-        "1101" after 8195 ns,
-        "0101" after 8215 ns,
-        -- Byte 2 (0xD5)
         "1101" after 8235 ns,
         "0101" after 8255 ns,
-        (others => 'Z') after 8275 ns;
+        -- Byte 2 (0xD9)
+        "1101" after 8275 ns,
+        "1001" after 8295 ns,
+        (others => 'Z') after 8315 ns;
 
 uut: PmodSF3SPIController
     PORT map(

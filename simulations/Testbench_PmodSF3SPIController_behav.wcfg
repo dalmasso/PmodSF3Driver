@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="4,700.001 ns"></ZoomEndTime>
-      <Cursor1Time time="1,195.000 ns"></Cursor1Time>
+      <ZoomStartTime time="7,342.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="8,546.001 ns"></ZoomEndTime>
+      <Cursor1Time time="8,005.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="148"></NameColumnWidth>
+      <NameColumnWidth column_width="144"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="34" />
+   <WVObjectSize size="31" />
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/i_sys_clock">
       <obj_property name="ElementShortName">i_sys_clock</obj_property>
       <obj_property name="ObjectShortName">i_sys_clock</obj_property>
@@ -100,8 +100,8 @@
       <obj_property name="ObjectShortName">data_bytes_reg</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/bit_counter">
-      <obj_property name="ElementShortName">bit_counter[3:0]</obj_property>
-      <obj_property name="ObjectShortName">bit_counter[3:0]</obj_property>
+      <obj_property name="ElementShortName">bit_counter[2:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_counter[2:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/bit_counter_end">
       <obj_property name="ElementShortName">bit_counter_end</obj_property>
@@ -115,17 +115,10 @@
       <obj_property name="ElementShortName">o_sclk</obj_property>
       <obj_property name="ObjectShortName">o_sclk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/sclk_rising_edge">
-      <obj_property name="ElementShortName">sclk_rising_edge</obj_property>
-      <obj_property name="ObjectShortName">sclk_rising_edge</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/sclk_falling_edge">
-      <obj_property name="ElementShortName">sclk_falling_edge</obj_property>
-      <obj_property name="ObjectShortName">sclk_falling_edge</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/io_dq">
       <obj_property name="ElementShortName">io_dq[3:0]</obj_property>
       <obj_property name="ObjectShortName">io_dq[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/data_w_reg">
       <obj_property name="ElementShortName">data_w_reg[39:0]</obj_property>
@@ -139,10 +132,6 @@
    <wvobject type="logic" fp_name="/Testbench_PmodSF3SPIController/uut/o_data_ready">
       <obj_property name="ElementShortName">o_data_ready</obj_property>
       <obj_property name="ObjectShortName">o_data_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/data_r_reg">
-      <obj_property name="ElementShortName">data_r_reg[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_r_reg[7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3SPIController/uut/o_data_r">
       <obj_property name="ElementShortName">o_data_r[7:0]</obj_property>

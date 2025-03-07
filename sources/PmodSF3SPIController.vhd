@@ -102,10 +102,14 @@ constant SPI_DQ_IDLE: STD_LOGIC := 'Z';
 constant DISABLE_SS_BIT: STD_LOGIC := '1';
 
 -- SPI Bit Counter Increment
-constant SPI_BIT_COUNTER_END: UNSIGNED(2 downto 0) := "111";
 constant SPI_BIT_COUNTER_INCREMENT_1: UNSIGNED(2 downto 0) := "001";
 constant SPI_BIT_COUNTER_INCREMENT_2: UNSIGNED(2 downto 0) := "010";
 constant SPI_BIT_COUNTER_INCREMENT_4: UNSIGNED(2 downto 0) := "100";
+
+-- SPI Bit Counter Ends
+constant SPI_SINGLE_BIT_COUNTER_END: UNSIGNED(2 downto 0) := "111";
+constant SPI_DUAL_BIT_COUNTER_END: UNSIGNED(2 downto 0) := "110";
+constant SPI_QUAD_BIT_COUNTER_END: UNSIGNED(2 downto 0) := "100";
 
 -- Memory Read Mode
 constant MEM_READ_MODE: STD_LOGIC := '1';
@@ -213,7 +217,7 @@ begin
 								if (mem_mode_reg = MEM_READ_MODE) and (dummy_cycles_reg /= 0) then
 									next_state <= DUMMY_CYCLES;
 								else
-									next_state <= BYTES_TXRX;									
+									next_state <= BYTES_TXRX;
 								end if;
 
 							-- Continue Write Address Bytes
@@ -224,7 +228,7 @@ begin
 			-- Dummy Cycles
 			when DUMMY_CYCLES =>
 							-- End of Dummy Cycles
-							if (dummy_cycles_reg <= 1) then
+							if (dummy_cycles_reg = 0) then
 								next_state <= BYTES_TXRX;
 
 							-- Continue Waiting Dummy Cycles
@@ -347,11 +351,11 @@ begin
 						data_w_reg(SPI_WRITE_REGISTER_ADDR_DATA_MSB downto 0) <= i_data_w & EMPTY_WRITE_BITS;
 					end if;
 
-				-- Handle Next Data to Write (Left-Shift Data Write Register & new Data Input)
-				elsif (state = WRITE_CMD) or (state = WRITE_ADDR) or (state = BYTES_TXRX) then
+				-- Handle Next Data to Write on SCLK Falling Edge (Left-Shift Data Write Register & new Data Input)
+				elsif (sclk_falling_edge = '1') then
 
-					-- Next Data to Write on SCLK Falling Edge
-					if (sclk_falling_edge = '1') and (addr_bytes_reg /= 0) and (data_bytes_reg /= 0) then
+					-- Write Command, Address and Data (in Write Mode only)
+					if (state = WRITE_CMD) or ((state = WRITE_ADDR) and (addr_bytes_reg /= 0)) or ((state = BYTES_TXRX) and (data_bytes_reg /= 0) and (mem_mode_reg = MEM_WRITE_MODE)) then
 
 						-- Single SPI Mode: DQ0
 						if (spi_single_enable_reg = '1') then
@@ -413,8 +417,8 @@ begin
 				if (state = IDLE) then
 					dummy_cycles_reg <= i_dummy_cycles;
 
-				-- Dummy Cycles State
-				elsif (state = DUMMY_CYCLES) then
+				-- Dummy Cycles State (only at SCLK Rising Edge)
+				elsif (state = DUMMY_CYCLES) and (sclk_rising_edge = '1') then
 					-- Decrement Dummy Cycles
 					dummy_cycles_reg <= dummy_cycles_reg -1;
 				end if;
@@ -463,7 +467,7 @@ begin
 						bit_counter_increment <= SPI_BIT_COUNTER_INCREMENT_1;
 
 					-- Dual SPI Mode
-					elsif (spi_dual_enable_reg = '1')  then
+					elsif (spi_dual_enable_reg = '1') then
 						bit_counter_increment <= SPI_BIT_COUNTER_INCREMENT_2;
 
 					-- Quad SPI Mode
@@ -493,8 +497,20 @@ begin
 			if (i_sys_clock_en = '1') then
 				
 				-- Bit Counter End Trigger (only at SCLK Rising Edge)
-				if (sclk_rising_edge = '1') and (bit_counter = SPI_BIT_COUNTER_END) then
-					bit_counter_end <= '1';
+				if (sclk_rising_edge = '1') then
+
+					-- Single SPI Mode
+					if (spi_single_enable_reg = '1') and (bit_counter = SPI_SINGLE_BIT_COUNTER_END) then
+						bit_counter_end <= '1';
+
+					-- Dual SPI Mode
+					elsif (spi_dual_enable_reg = '1') and (bit_counter = SPI_DUAL_BIT_COUNTER_END) then
+						bit_counter_end <= '1';
+
+					-- Quad SPI Mode
+					elsif (spi_single_enable_reg = '0') and (spi_dual_enable_reg = '0') and (bit_counter = SPI_QUAD_BIT_COUNTER_END) then
+						bit_counter_end <= '1';
+					end if;
 				
 				-- Reset Bit Counter End
 				else
@@ -549,7 +565,7 @@ begin
 			-- Sampling Read Data Enable
 			if (i_sys_clock_en = '1') then
 				
-				-- Next Data to Write on SCLK Rising Edge (Left-Shift Data Read Register & new SPI Data Input)
+				-- Next Data to Write on SCLK Rising Edge 
 				if (sclk_rising_edge = '1') and (mem_mode_reg = MEM_READ_MODE) and (state = BYTES_TXRX) then
 
 					-- Check Last Byte Cycle					
