@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,000.001 ns"></ZoomEndTime>
-      <Cursor1Time time="0.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="21.000001 us"></ZoomEndTime>
+      <Cursor1Time time="17.305000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="190"></NameColumnWidth>
-      <ValueColumnWidth column_width="67"></ValueColumnWidth>
+      <NameColumnWidth column_width="179"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="36" />
+   <WVObjectSize size="38" />
    <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/i_sys_clock">
       <obj_property name="ElementShortName">i_sys_clock</obj_property>
       <obj_property name="ObjectShortName">i_sys_clock</obj_property>
@@ -120,13 +120,9 @@
       <obj_property name="ElementShortName">o_ready</obj_property>
       <obj_property name="ObjectShortName">o_ready</obj_property>
    </wvobject>
-   <wvobject type="other" fp_name="/Testbench_PmodSF3Driver/uut/dummy_cycles">
-      <obj_property name="ElementShortName">dummy_cycles</obj_property>
-      <obj_property name="ObjectShortName">dummy_cycles</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/sclk_falling_edge">
-      <obj_property name="ElementShortName">sclk_falling_edge</obj_property>
-      <obj_property name="ObjectShortName">sclk_falling_edge</obj_property>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/dummy_cycles_reg">
+      <obj_property name="ElementShortName">dummy_cycles_reg</obj_property>
+      <obj_property name="ObjectShortName">dummy_cycles_reg</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/data_w_reg">
       <obj_property name="ElementShortName">data_w_reg[39:0]</obj_property>
@@ -151,6 +147,18 @@
    <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/bit_counter_end">
       <obj_property name="ElementShortName">bit_counter_end</obj_property>
       <obj_property name="ObjectShortName">bit_counter_end</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/spi_single_enable_reg">
+      <obj_property name="ElementShortName">spi_single_enable_reg</obj_property>
+      <obj_property name="ObjectShortName">spi_single_enable_reg</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/spi_dual_enable_reg">
+      <obj_property name="ElementShortName">spi_dual_enable_reg</obj_property>
+      <obj_property name="ObjectShortName">spi_dual_enable_reg</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider83" type="divider">
+      <obj_property name="label">SPI Mode Handler</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIModes/o_spi_single_enable">
       <obj_property name="ElementShortName">o_spi_single_enable</obj_property>

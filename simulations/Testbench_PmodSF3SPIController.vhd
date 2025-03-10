@@ -52,30 +52,30 @@ ARCHITECTURE Behavioral of Testbench_PmodSF3SPIController is
 COMPONENT PmodSF3SPIController is
 
 PORT(
-	-- Module Control
-	i_sys_clock: IN STD_LOGIC;
-	i_sys_clock_en: IN STD_LOGIC;
-	i_reset: IN STD_LOGIC;
-	i_start: IN STD_LOGIC;
-	-- SPI Mode Config (Single, Dual or Quad)
-	i_spi_single_enable: IN STD_LOGIC;
-	i_spi_dual_enable: IN STD_LOGIC;
-	-- Memory Command/Addr/Data
-	i_mode: IN STD_LOGIC;
-	i_command: IN UNSIGNED(7 downto 0);
-	i_addr_bytes: IN INTEGER range 0 to 3;
-	i_addr: IN UNSIGNED(23 downto 0);
-	i_dummy_cycles: IN INTEGER range 0 to 15;
-	i_data_bytes: IN INTEGER;
-	i_data_w: IN UNSIGNED(7 downto 0);
-	o_next_data_w: OUT STD_LOGIC;
-	o_data_r: OUT UNSIGNED(7 downto 0);
-	o_data_ready: OUT STD_LOGIC;
-	-- Module Outputs
-	o_ready: OUT STD_LOGIC;
-	o_reset: OUT STD_LOGIC;
-	o_sclk: OUT STD_LOGIC;
-	io_dq: INOUT STD_LOGIC_VECTOR(3 downto 0);
+    -- Module Control
+    i_sys_clock: IN STD_LOGIC;
+    i_sys_clock_en: IN STD_LOGIC;
+    i_reset: IN STD_LOGIC;
+    i_start: IN STD_LOGIC;
+    -- SPI Mode Config (Single, Dual or Quad)
+    i_spi_single_enable: IN STD_LOGIC;
+    i_spi_dual_enable: IN STD_LOGIC;
+    -- Memory Command/Addr/Data
+    i_mode: IN STD_LOGIC;
+    i_command: IN UNSIGNED(7 downto 0);
+    i_addr_bytes: IN INTEGER range 0 to 3;
+    i_addr: IN UNSIGNED(23 downto 0);
+    i_dummy_cycles: IN INTEGER range 0 to 14;
+    i_data_bytes: IN INTEGER;
+    i_data_w: IN UNSIGNED(7 downto 0);
+    o_next_data_w: OUT STD_LOGIC;
+    o_data_r: OUT UNSIGNED(7 downto 0);
+    o_data_ready: OUT STD_LOGIC;
+    -- Module Outputs
+    o_ready: OUT STD_LOGIC;
+    o_reset: OUT STD_LOGIC;
+    o_sclk: OUT STD_LOGIC;
+    io_dq: INOUT STD_LOGIC_VECTOR(3 downto 0);
     o_ss: OUT STD_LOGIC
 );
 
@@ -93,7 +93,7 @@ signal mode: STD_LOGIC := '0';
 signal command: UNSIGNED(7 downto 0) := (others => '0');
 signal addr_bytes: INTEGER range 0 to 3 := 0;
 signal addr: UNSIGNED(23 downto 0):= (others => '0');
-signal dummy_cycles: INTEGER range 0 to 15 := 0;
+signal dummy_cycles: INTEGER range 0 to 14 := 0;
 signal data_bytes: INTEGER := 0;
 signal data_w: UNSIGNED(7 downto 0):= (others => '0');
 signal next_data_w: STD_LOGIC := '0';

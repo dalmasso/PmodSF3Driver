@@ -103,7 +103,11 @@ signal enhanced_volatile_first_byte: STD_LOGIC := '0';
 
 -- Enhanced Volatile SPI Mode Register
 signal enhanced_volatile_spi_mode_reg: UNSIGNED(1 downto 0) := (others => '0');
-signal apply_enhanced_volatile_spi_mode: STD_LOGIC := '0';
+
+-- Apply New SPI Mode Trigger
+signal end_of_tx_reg0: STD_LOGIC := '0';
+signal end_of_tx_reg1: STD_LOGIC := '0';
+signal apply_new_spi_mode: STD_LOGIC := '0';
 
 -- SPI Mode Output Register
 signal spi_mode_out_reg: UNSIGNED(1 downto 0) := (others => '0');
@@ -148,7 +152,6 @@ begin
 			end if;
 		end if;
 	end process;
-
 
 	--------------------------------------------------------
 	-- Non-Volatile Read/Write Byte Configuration Handler --
@@ -251,22 +254,19 @@ begin
 		end if;
 	end process;
 
-	-----------------------------------------------
-	-- Apply New Enhanced Volatile Configuration --
-	-----------------------------------------------
+	------------------------
+	-- Apply New SPI Mode --
+	------------------------
 	process(i_sys_clock)
 	begin
 		if rising_edge(i_sys_clock) then
 
-			-- Apply New Enhanced Volatile Configuration Register to Output Register
-            if (i_command = WRITE_ENHANCED_VOLATILE_CONFIG_COMMAND) then
-                apply_enhanced_volatile_spi_mode <= '1';
-            else
-				apply_enhanced_volatile_spi_mode <= '0';
-            end if;
-
+			-- End of SPI Transmission Detection
+			end_of_tx_reg0 <= i_end_of_tx;
+			end_of_tx_reg1 <= end_of_tx_reg0;
 		end if;
-    end process;
+	end process;
+	apply_new_spi_mode <= end_of_tx_reg0 and not(end_of_tx_reg1);
 
 	------------------------------
 	-- SPI Mode Output Register --
@@ -279,13 +279,17 @@ begin
 			if (i_reset = '1') then
 				spi_mode_out_reg <= SPI_SINGLE_MODE;
 
-			-- Reset Memory Command (use Non-Volatile SPI Mode)
-			elsif (i_command = RESET_NON_VOLATILE_COMMAND) then
-				spi_mode_out_reg <= non_volatile_spi_mode_reg;
+			-- Apply New SPI Mode (at the End of SPI Transmission)
+			elsif (apply_new_spi_mode = '1') then
 
-			-- Write Enhanced Volatile Configuration Register (use Enhanced Volatile SPI Mode)
-			elsif (apply_enhanced_volatile_spi_mode = '1') then
-				spi_mode_out_reg <= enhanced_volatile_spi_mode_reg;
+				-- Reset Memory Command (use Non-Volatile SPI Mode)
+				if (i_command = RESET_NON_VOLATILE_COMMAND) then
+					spi_mode_out_reg <= non_volatile_spi_mode_reg;
+
+				-- Write Enhanced Volatile Configuration Register (use Enhanced Volatile SPI Mode)
+				elsif (i_command = WRITE_ENHANCED_VOLATILE_CONFIG_COMMAND) or (i_command = READ_ENHANCED_VOLATILE_CONFIG_COMMAND) then
+					spi_mode_out_reg <= enhanced_volatile_spi_mode_reg;
+				end if;
 			end if;
 		end if;
 	end process;

@@ -13,6 +13,7 @@
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
 --		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
+--		Input 	-	i_end_of_tx: End of SPI Transmission ('0': In progress, '1': End of Transmission)
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_new_data_to_mem: New Data to Write on FLASH Ready (Write Mode) ('0': NOT Ready, '1': Ready)
 --		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
@@ -30,12 +31,13 @@ ENTITY PmodSF3DummyCycles is
 PORT(
 	i_sys_clock: IN STD_LOGIC;
 	i_reset: IN STD_LOGIC;
+	i_end_of_tx: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
 	i_data_from_mem_ready: IN STD_LOGIC;
     i_data_from_mem: IN UNSIGNED(7 downto 0);
-    o_dummy_cycles: OUT INTEGER range 0 to 15
+    o_dummy_cycles: OUT INTEGER range 0 to 14
 );
 
 END PmodSF3DummyCycles;
@@ -72,9 +74,14 @@ signal volatile_first_byte: STD_LOGIC := '0';
 
 -- Volatile Dummy Cycles Register
 signal volatile_dummy_cycles_reg: UNSIGNED(3 downto 0) := (others => '0');
-signal apply_volatile_dummy_cycles: STD_LOGIC := '0';
 
--- Dummy Cycles Output Register
+-- Apply New Dummy Cycles Trigger
+signal end_of_tx_reg0: STD_LOGIC := '0';
+signal end_of_tx_reg1: STD_LOGIC := '0';
+signal apply_new_dummy_cycles: STD_LOGIC := '0';
+
+-- Dummy Cycles Registers
+signal dummy_cycles_reg: UNSIGNED(3 downto 0) := (others => '0');
 signal dummy_cycles_out_reg: UNSIGNED(3 downto 0) := (others => '0');
 
 ------------------------------------------------------------------------
@@ -90,7 +97,7 @@ begin
 		if rising_edge(i_sys_clock) then
 
 			-- First Byte to Read/Write
-			if (i_reset = '1') then
+			if (i_end_of_tx = '1') then
 				non_volatile_first_byte <= '1';
 			
 			-- Next Byte to Write
@@ -134,7 +141,7 @@ begin
 		if rising_edge(i_sys_clock) then
 
 			-- First Byte to Read/Write
-			if (i_reset = '1') then
+			if (i_end_of_tx = '1') then
 				volatile_first_byte <= '1';
 			
 			-- Next Byte to Write
@@ -170,41 +177,63 @@ begin
         end if;
     end process;
 
-	--------------------------------------
-	-- Apply New Volatile Configuration --
-	--------------------------------------
+	----------------------------
+	-- Apply New Dummy Cycles --
+	----------------------------
 	process(i_sys_clock)
 	begin
 		if rising_edge(i_sys_clock) then
 
-			-- Apply New Volatile Configuration Register to Output Register
-            if (i_command = WRITE_VOLATILE_CONFIG_COMMAND) then
-                apply_volatile_dummy_cycles <= '1';
-            else
-				apply_volatile_dummy_cycles <= '0';
-            end if;
-
+			-- End of SPI Transmission Detection
+			end_of_tx_reg0 <= i_end_of_tx;
+			end_of_tx_reg1 <= end_of_tx_reg0;
 		end if;
-    end process;
+	end process;
+	apply_new_dummy_cycles <= end_of_tx_reg0 and not(end_of_tx_reg1);
 
-	----------------------------------
-	-- Dummy Cycles Output Register --
-	----------------------------------
+	---------------------------
+	-- Dummy Cycles Register --
+	---------------------------
 	process(i_sys_clock)
 	begin
 		if rising_edge(i_sys_clock) then
 
 			-- Reset Memory Command (use Non-Volatile Dummy Cycles)
 			if (i_command = RESET_NON_VOLATILE_COMMAND) then
-				dummy_cycles_out_reg <= non_volatile_dummy_cycles_reg;
+				dummy_cycles_reg <= non_volatile_dummy_cycles_reg;
 
 			-- Write Volatile Configuration Register (use Volatile Dummy Cycles)
-			elsif (apply_volatile_dummy_cycles = '1') then
-				dummy_cycles_out_reg <= volatile_dummy_cycles_reg;
+			elsif (i_command = WRITE_VOLATILE_CONFIG_COMMAND) or (i_command = READ_VOLATILE_CONFIG_COMMAND) then
+				dummy_cycles_reg <= volatile_dummy_cycles_reg;
 			end if;
 		end if;
 	end process;
 
+	----------------------------------
+	-- Dummy Cycles Register Format --
+	----------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+
+			-- Reset
+			if (i_reset = '1') then
+				dummy_cycles_out_reg <= (others => '0');
+
+			-- Apply New Dummy Cycles (at the End of SPI Transmission)
+			elsif (apply_new_dummy_cycles = '1') then
+
+				-- Dummy Cycles from 0 to 14
+				if (dummy_cycles_reg = x"F") then
+					dummy_cycles_out_reg <= (others => '0');
+
+				else
+					dummy_cycles_out_reg <= dummy_cycles_reg;
+				end if;
+			end if;
+		end if;
+	end process;
+	
 	-------------------------
 	-- Dummy Cycles Output --
 	-------------------------

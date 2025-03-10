@@ -91,7 +91,7 @@ PORT(
 	i_command: IN UNSIGNED(7 downto 0);
 	i_addr_bytes: IN INTEGER range 0 to 3;
 	i_addr: IN UNSIGNED(23 downto 0);
-	i_dummy_cycles: IN INTEGER range 0 to 15;
+	i_dummy_cycles: IN INTEGER range 0 to 14;
 	i_data_bytes: IN INTEGER;
 	i_data_w: IN UNSIGNED(7 downto 0);
 	o_next_data_w: OUT STD_LOGIC;
@@ -118,7 +118,7 @@ PORT(
 	i_reset: IN STD_LOGIC;
 	i_spi_single_enable: IN STD_LOGIC;
 	i_spi_dual_enable: IN STD_LOGIC;
-	i_dummy_cycles: IN INTEGER range 0 to 15;
+	i_dummy_cycles: IN INTEGER range 0 to 14;
 	o_spi_freq: OUT STD_LOGIC;
 	o_using_sys_freq: OUT STD_LOGIC
 );
@@ -130,12 +130,13 @@ COMPONENT PmodSF3DummyCycles is
 PORT(
 	i_sys_clock: IN STD_LOGIC;
 	i_reset: IN STD_LOGIC;
+	i_end_of_tx: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
 	i_data_from_mem_ready: IN STD_LOGIC;
     i_data_from_mem: IN UNSIGNED(7 downto 0);
-    o_dummy_cycles: OUT INTEGER range 0 to 15
+    o_dummy_cycles: OUT INTEGER range 0 to 14
 );
 
 END COMPONENT;
@@ -175,7 +176,7 @@ constant DATA_BIT_UNUSED: STD_LOGIC := '0';
 -- Signal Declarations
 ------------------------------------------------------------------------
 -- Pmod SF3 Driver States
-TYPE pmodPSF3State is (IDLE, START, IN_PROGRESS, COMPLETED);
+TYPE pmodPSF3State is (IDLE, START, IN_PROGRESS, REFRESH_CONFIG, COMPLETED);
 signal state: pmodPSF3State := IDLE;
 signal next_state: pmodPSF3State;
 
@@ -193,7 +194,7 @@ signal data_ready_sig: STD_LOGIC := '0';
 signal data_ready_reg: STD_LOGIC := '0';
 
 -- Dummy Cycles
-signal dummy_cycles: INTEGER range 0 to 15 := 0;
+signal dummy_cycles: INTEGER range 0 to 14 := 0;
 
 -- SPI Controller Ready
 signal spi_ready: STD_LOGIC := '0';
@@ -250,11 +251,14 @@ begin
 
 			-- In Progress
 			when IN_PROGRESS =>	if (spi_ready = '1') then
-									next_state <= COMPLETED;
+									next_state <= REFRESH_CONFIG;
 								else
 									next_state <= IN_PROGRESS;
 								end if;
 			
+			-- Refresh Configurations
+			when REFRESH_CONFIG => next_state <= COMPLETED;
+
 			-- Completed
 			when others => next_state <= IDLE;
 		end case;
@@ -287,9 +291,21 @@ begin
 
 			-- Data Write Left-Shift
 			elsif (state = IN_PROGRESS) and (next_data_sig = '1') then
-				data_w_reg <= data_w_reg(DATA_HIGH_BIT_MSB-1 downto 0) & DATA_BIT_UNUSED;
+
+				-- Single SPI Mode
+				if (spi_single_enable = '1') then
+					data_w_reg <= data_w_reg(DATA_HIGH_BIT_MSB-1 downto 0) & DATA_BIT_UNUSED;
+						
+				-- Dual SPI Mode
+				elsif (spi_dual_enable = '1') then
+					data_w_reg <= data_w_reg(DATA_HIGH_BIT_MSB-2 downto 0) & DATA_BIT_UNUSED & DATA_BIT_UNUSED;
+						
+				-- Quad SPI Mode
+				else
+					data_w_reg <= data_w_reg(DATA_HIGH_BIT_MSB-4 downto 0) & DATA_BIT_UNUSED & DATA_BIT_UNUSED & DATA_BIT_UNUSED & DATA_BIT_UNUSED;
+				end if;
+
 			end if;
-			
 		end if;
 	end process;
 
@@ -363,7 +379,8 @@ begin
 	inst_PmodSF3DummyCycles: PmodSF3DummyCycles
 		PORT map (
 			i_sys_clock => i_sys_clock,
-			i_reset => spi_ready,
+			i_reset => i_reset,
+			i_end_of_tx => spi_ready,
 			i_command => i_command,
 			i_new_data_to_mem => next_data_sig,
 			i_data_to_mem => data_w_reg(DATA_HIGH_BIT_MSB downto DATA_HIGH_BIT_LSB),

@@ -13,6 +13,7 @@
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
 --		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
+--		Input 	-	i_end_of_tx: End of SPI Transmission ('0': In progress, '1': End of Transmission)
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_new_data_to_mem: New Data to Write on FLASH Ready (Write Mode) ('0': NOT Ready, '1': Ready)
 --		Input 	-	i_data_to_mem: Data Bytes to Write on FLASH
@@ -35,12 +36,13 @@ COMPONENT PmodSF3DummyCycles is
 PORT(
 	i_sys_clock: IN STD_LOGIC;
     i_reset: IN STD_LOGIC;
+    i_end_of_tx: IN STD_LOGIC;
     i_command: IN UNSIGNED(7 downto 0);
 	i_new_data_to_mem: IN STD_LOGIC;
     i_data_to_mem: IN UNSIGNED(7 downto 0);
 	i_data_from_mem_ready: IN STD_LOGIC;
     i_data_from_mem: IN UNSIGNED(7 downto 0);
-    o_dummy_cycles: OUT INTEGER range 0 to 15
+    o_dummy_cycles: OUT INTEGER range 0 to 14
 );
 
 END COMPONENT;
@@ -48,12 +50,13 @@ END COMPONENT;
 signal sys_clock: STD_LOGIC := '0';
 signal sys_clock_2: STD_LOGIC := '0';
 signal reset: STD_LOGIC := '0';
+signal end_of_tx: STD_LOGIC := '0';
 signal command: UNSIGNED(7 downto 0) := (others => '0');
 signal new_data_to_mem: STD_LOGIC := '0';
 signal data_to_mem: UNSIGNED(7 downto 0) := x"AB";
 signal data_from_mem_ready: STD_LOGIC := '0';
 signal data_from_mem: UNSIGNED(7 downto 0) := x"CD";
-signal dummy_cycles: INTEGER range 0 to 15 := 0;
+signal dummy_cycles: INTEGER range 0 to 14 := 0;
 
 begin
 
@@ -73,6 +76,13 @@ reset <=    '1', '0' after 145 ns,
             '1' after 5.205 us, '0' after 5.245 us,
             -- Reset after Write Non Volatile
             '1' after 7.125 us, '0' after 7.165 us;
+
+-- End of Transmission
+end_of_tx <='1', '0' after 145 ns,
+            -- End after Write Enhanced Volatile
+            '1' after 15.685 us, '0' after 15.845 us,
+            -- End after Write Non Volatile
+            '1' after 28.485 us, '0' after 28.645 us;
 
 -- Command
 process(sys_clock_2)
@@ -138,6 +148,7 @@ uut: PmodSF3DummyCycles
     PORT map(
         i_sys_clock => sys_clock,
         i_reset => reset,
+        i_end_of_tx => end_of_tx,
         i_command => command,
         i_new_data_to_mem => new_data_to_mem,
 		i_data_to_mem => data_to_mem,

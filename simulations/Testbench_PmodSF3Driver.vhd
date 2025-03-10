@@ -103,61 +103,283 @@ reset <= '1', '0' after 145 ns;
 
 -- Start
 start <= '0',
-        -- Read then Write Cycles (SPI Single Mode)
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
         '1' after 200 ns, '0' after 326 ns,
-        '1' after 2505 ns, '0' after 2631 ns,
-        -- 2 Dummy Cycles (Volatile)
-        '1' after 5020 ns, '0' after 5100 ns;
+        -- Read Volatile SPI Mode
+        '1' after 2000 ns, '0' after 2300 ns,
+        -- Write Data
+        '1' after 3000 ns, '0' after 3300 ns,
+        -- Write Volatile Dummy Cycles (2)
+        '1' after 5000 ns, '0' after 5300 ns,
+        -- Write Volatile SPI Mode (Dual)
+        '1' after 7000 ns, '0' after 7300 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2)
+        '1' after 8000 ns, '0' after 8050 ns,
+        -- Read Volatile SPI Mode (Dual)
+        '1' after 9000 ns, '0' after 9050 ns,
+        -- Write Data
+        '1' after 10000 ns, '0' after 10300 ns,
+        -- Write Volatile Dummy Cycles (0)
+        '1' after 11000 ns, '0' after 11050 ns,
+        -- Write Volatile SPI Mode (Quad)
+        '1' after 12000 ns, '0' after 12050 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        '1' after 13000 ns, '0' after 13025 ns,
+        -- Read Volatile SPI Mode (Quad)
+        '1' after 14000 ns, '0' after 14025 ns,
+        -- Write Data
+        '1' after 15000 ns, '0' after 15025 ns,
+
+        -- Write Volatile Dummy Cycles (5)
+        '1' after 16000 ns, '0' after 16025 ns,
+        -- Read Data
+        '1' after 17000 ns, '0' after 17025 ns;
 
 -- Memory Operation Mode (Read then Write)
-mode <= -- SPI Single Mode
-        '1', '0' after 500 ns;
+mode <= -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles & Read Volatile SPI Mode
+        '1',
+        -- Write Data, Write Volatile Dummy Cycles (2), Write Volatile SPI Mode (Dual)
+        '0' after 2500 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2) & Read Volatile SPI Mode Dual)
+        '1' after 7800 ns,
+        -- Write Data, Write Volatile Dummy Cycles (0), Write Volatile SPI Mode (Quad)
+        '0' after 9800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0) & Read Volatile SPI Mode (Quad)
+        '1' after 12800 ns,
+        -- Write Data
+        '0' after 14800 ns,
+        -- Read Data
+        '1' after 16800 ns;
 
 -- Command
-command <=  x"A2",
-            -- 2 Dummy Cycles (Volatile)
-            x"81" after 5000 ns;
+command <=  
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
+        x"85" after 180 ns,
+        -- Read Volatile SPI Mode
+        x"65" after 1800 ns,
+        -- Write Data
+        x"AB" after 2800 ns,
+        -- Write Volatile Dummy Cycles (2)
+        x"81" after 4800 ns,
+        -- Write Volatile SPI Mode (Dual)
+        x"61" after 6800 ns,
 
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2)
+        x"85" after 7800 ns,
+        -- Read Volatile SPI Mode (Dual)
+        x"65" after 8800 ns,
+        -- Write Data
+        x"AB" after 9800 ns,
+        -- Write Volatile Dummy Cycles (0)
+        x"81" after 10800 ns,
+        -- Write Volatile SPI Mode (Quad)
+        x"61" after 11800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        x"85" after 12800 ns,
+        -- Read Volatile SPI Mode (Quad)
+        x"65" after 13800 ns,
+        -- Write Data
+        x"AB" after 14800 ns,
+
+        -- Write Volatile Dummy Cycles (5)
+        x"81" after 15800 ns,
+        -- Read Data
+        x"AB" after 16800 ns;
 
 -- Address Bytes
-addr_bytes <=   3,
-                -- 2 Dummy Cycles (Volatile)
-                0 after 5000 ns;
+addr_bytes <=
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
+        0 after 180 ns,
+        -- Read Volatile SPI Mode
+        0 after 1800 ns,
+        -- Write Data
+        3 after 2800 ns,
+        -- Write Volatile Dummy Cycles (2) & Write Volatile SPI Mode (Dual)
+        0 after 4800 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2)
+        0 after 7800 ns,
+        -- Read Volatile SPI Mode (Dual)
+        0 after 8800 ns,
+        -- Write Data
+        3 after 9800 ns,
+        -- Write Volatile Dummy Cycles (0)
+        0 after 10800 ns,
+        -- Write Volatile SPI Mode (Quad)
+        0 after 11800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        0 after 12800 ns,
+        -- Read Volatile SPI Mode (Quad)
+        0 after 13800 ns,
+        -- Write Data
+        1 after 14800 ns,
+
+        -- Write Volatile Dummy Cycles (5)
+        0 after 15800 ns,
+        -- Read Data
+        3 after 16800 ns;
+
 -- Address
 addr <= x"123456";
 
 -- Data Bytes
-data_bytes <=   2,
-                -- 2 Dummy Cycles (Volatile)
-                1 after 5000 ns;
+data_bytes <=
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
+        1 after 180 ns,
+        -- Read Volatile SPI Mode
+        1 after 1800 ns,
+        -- Write Data
+        2 after 2800 ns,
+        -- Write Volatile Dummy Cycles (2) & Write Volatile SPI Mode (Dual)
+        1 after 4800 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2)
+        1 after 7800 ns,
+        -- Read Volatile SPI Mode (Dual)
+        1 after 8800 ns,
+        -- Write Data
+        3 after 9800 ns,
+        -- Write Volatile Dummy Cycles (0)
+        1 after 10800 ns,
+        -- Write Volatile SPI Mode (Quad)
+        1 after 11800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        1 after 12800 ns,
+        -- Read Volatile SPI Mode (Quad)
+        1 after 13800 ns,
+        -- Write Data
+        1 after 14800 ns,
+
+        -- Write Volatile Dummy Cycles (5)
+        1 after 15800 ns,
+        -- Read Data
+        1 after 16800 ns;
 
 -- Data to Write
-data_w <=   x"8B",
-            -- 2 Dummy Cycles (Volatile)
-            "00101011" after 5000 ns;
+data_w <=
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
+        (others => '0') after 180 ns,
+        -- Read Volatile SPI Mode
+        (others => '0') after 1800 ns,
+        -- Write Data
+        x"8B" after 2800 ns,
+        -- Write Volatile Dummy Cycles (2)
+        "00101011" after 4800 ns,
+        -- Write Volatile SPI Mode (Dual)
+        "10111111" after 6800 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2) & Read Volatile SPI Mode (Dual)
+        (others => '0') after 7800 ns,
+        -- Write Data
+        x"98" after 9800 ns,
+        -- Write Volatile Dummy Cycles (0)
+        "11111011" after 10800 ns,
+        -- Write Volatile SPI Mode (Quad)
+        "01111111" after 11800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        (others => '0') after 12800 ns,
+        -- Read Volatile SPI Mode (Quad)
+        (others => '0') after 13800 ns,
+        -- Write Data
+        x"CD" after 14800 ns,
+
+        -- Write Volatile Dummy Cycles (5)
+        "01011011" after 15800 ns,
+
+        -- Read Data
+        (others => '0') after 16800 ns;
 
 -- SPI DQ[3:0]
-dq <= (others => 'Z'),
-        -- Read then Write (SPI Single Mode)
-        -- Byte 1 (0xAD)
-        "0010" after 875 ns,
-        "0000" after 895 ns,
-        "0010" after 915 ns,
-        "0000" after 935 ns,
-        "0010" after 955 ns,
-        "0010" after 975 ns,
-        "0000" after 995 ns,
-        "0010" after 1015 ns,
-        -- Byte 2 (0xF1)
-        "0010" after 1035 ns,
-        "0010" after 1055 ns,
-        "0010" after 1075 ns,
-        "0010" after 1095 ns,
-        "0000" after 1115 ns,
-        "0000" after 1135 ns,
-        "0000" after 1155 ns,
-        "0010" after 1175 ns,
-        (others => 'Z') after 1195 ns;
+dq <=   (others => 'Z'),
+        -- SPI Single Mode --
+        -- Read Volatile Dummy Cycles
+        -- 1 Byte (0xFB)
+        "0010" after 375 ns,
+        "0010" after 395 ns,
+        "0010" after 415 ns,
+        "0010" after 435 ns,
+        "0010" after 455 ns,
+        "0000" after 475 ns,
+        "0010" after 495 ns,
+        "0010" after 515 ns,
+        (others => 'Z') after 535 ns,
+
+        -- Read Volatile SPI Mode
+        -- 1 Byte (0xFF)
+        "0010" after 2175 ns,
+        "0010" after 2195 ns,
+        "0010" after 2215 ns,
+        "0010" after 2235 ns,
+        "0010" after 2255 ns,
+        "0010" after 2275 ns,
+        "0010" after 2295 ns,
+        "0010" after 2315 ns,
+        -- Write Data, Write Volatile Dummy Cycles (2), Write Volatile SPI Mode (Dual)
+        (others => 'Z') after 2335 ns,
+
+        -- SPI Dual Mode --
+        -- Read Volatile Dummy Cycles (2)
+        -- 1 Byte (0x2B)
+        "0000" after 8105 ns,
+        "0010" after 8125 ns,
+        "0010" after 8145 ns,
+        "0011" after 8165 ns,
+        (others => 'Z') after 8185 ns,
+
+        -- Read Volatile SPI Mode (Dual)
+        -- 1 Byte (0xBF)
+        "0010" after 9095 ns,
+        "0011" after 9115 ns,
+        "0011" after 9135 ns,
+        "0011" after 9155 ns,
+        (others => 'Z') after 9175 ns,
+
+        -- Write Data, Write Volatile Dummy Cycles (0), Write Volatile SPI Mode (Quad)
+        (others => 'Z') after 9800 ns,
+    
+        -- SPI Quad Mode --
+        -- Read Volatile Dummy Cycles (0)
+        -- 1 Byte (0xFB)
+        "1111" after 13055 ns,
+        "1011" after 13075 ns,
+        (others => 'Z') after 13095 ns,
+        -- Read Volatile SPI Mode (Quad)
+        -- 1 Byte (0x7F)
+        "0111" after 14055 ns,
+        "1111" after 14075 ns,
+        (others => 'Z') after 14095 ns,
+
+        -- Read Data
+        -- 1 Byte (0xC1)
+        "1100" after 17275 ns,
+        "0001" after 17295 ns,
+        (others => 'Z') after 17315 ns;
 
 uut: PmodSF3Driver
     GENERIC map(

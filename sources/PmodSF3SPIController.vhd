@@ -27,7 +27,7 @@
 --		Input 	-	i_command: Command Byte
 --		Input 	-	i_addr_bytes: Number of Address Bytes to use (0 to 3 bytes)
 --		Input 	-	i_addr: Address Bytes
---		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 15 cycles)
+--		Input 	-	i_dummy_cycles: Number of Dummy Cycles (0 to 14 cycles)
 --		Input 	-	i_data_bytes: Number of Data Bytes to write
 --		Input 	-	i_data_w: Data Bytes to write
 --		Output 	-	o_next_data_w: Next bit of Data Bytes trigger ('0': Disable, '1': Enable)
@@ -60,7 +60,7 @@ PORT(
 	i_command: IN UNSIGNED(7 downto 0);
 	i_addr_bytes: IN INTEGER range 0 to 3;
 	i_addr: IN UNSIGNED(23 downto 0);
-	i_dummy_cycles: IN INTEGER range 0 to 15;
+	i_dummy_cycles: IN INTEGER range 0 to 14;
 	i_data_bytes: IN INTEGER;
 	i_data_w: IN UNSIGNED(7 downto 0);
 	o_next_data_w: OUT STD_LOGIC;
@@ -138,7 +138,7 @@ signal data_bytes_reg: INTEGER := 0;
 signal data_w_reg: UNSIGNED(SPI_WRITE_REGISTER_LENGTH-1 downto 0) := (others => '0');
 
 -- Number of Dummy Cycles
-signal dummy_cycles_reg: INTEGER range 0 to 15 := 0;
+signal dummy_cycles_reg: INTEGER range 0 to 14 := 0;
 
 -- Data from Memory
 signal data_r_reg: UNSIGNED(7 downto 0) := (others => '0');
