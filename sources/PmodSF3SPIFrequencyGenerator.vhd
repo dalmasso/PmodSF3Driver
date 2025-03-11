@@ -111,8 +111,7 @@ signal spi_clock_div_ref: INTEGER := 0;
 -- SPI Clock Divider
 signal spi_clock_div: INTEGER := 0;
 
--- SPI Serial Clock Frequency
-signal spi_freq_enable: STD_LOGIC := '0';
+-- SPI Serial Clock Frequency Register
 signal spi_freq_reg: STD_LOGIC := '0';
 
 ------------------------------------------------------------------------
@@ -161,22 +160,6 @@ begin
 		end if;
 	end process;
 
-	-----------------------------
-	-- SPI Serial Clock Enable --
-	-----------------------------
-	process(i_sys_clock)
-	begin
-		if rising_edge(i_sys_clock) then
-	
-			-- SPI Clock Enable
-			if (spi_clock_div = 0) then
-				spi_freq_enable <= '1';
-			else
-				spi_freq_enable <= '0';
-			end if;
-		end if;
-	end process;
-
 	--------------------------------
 	-- SPI Serial Clock Frequency --
 	--------------------------------
@@ -184,13 +167,15 @@ begin
 	begin
 		if rising_edge(i_sys_clock) then
 	
-			-- Reset
-			if (i_reset = '1') or (spi_clock_div /= 0) then
+			-- Reset Frequency Register
+			if (i_reset = '1') then
 				spi_freq_reg <= '0';
 			
-			-- SPI Clock
+			-- Set Frequency Register
+			elsif (spi_clock_div = 0) then
+				spi_freq_reg <= '1';
 			else
-				spi_freq_reg <= i_sys_clock;
+				spi_freq_reg <= '0';
 			end if;
 		end if;
 	end process;

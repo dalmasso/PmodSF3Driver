@@ -281,9 +281,13 @@ begin
 	begin
 		if rising_edge(i_sys_clock) then
 
-			-- SCLK Edge Detection
-			sclk_edge_reg0 <= sclk_reg;
-			sclk_edge_reg1 <= sclk_edge_reg0;
+			-- Clock Enable
+			if (i_sys_clock_en = '1') then
+
+				-- SCLK Edge Detection
+				sclk_edge_reg0 <= sclk_reg;
+				sclk_edge_reg1 <= sclk_edge_reg0;
+			end if;
 		end if;
 	end process;
 	sclk_rising_edge <= sclk_edge_reg0 and not(sclk_edge_reg1);

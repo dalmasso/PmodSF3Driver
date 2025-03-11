@@ -204,8 +204,12 @@ signal spi_single_enable: STD_LOGIC := '0';
 signal spi_dual_enable: STD_LOGIC := '0';
 signal spi_quad_enable: STD_LOGIC := '0'; 
 
--- SPI Frequency
-signal spi_freq: STD_LOGIC := '0';
+-- SPI Frequency Generator
+signal spi_freq_gen_reset: STD_LOGIC := '0';
+signal spi_freq_en: STD_LOGIC := '0';
+
+-- SPI Controller Start
+signal spi_start: STD_LOGIC := '0';
 
 ------------------------------------------------------------------------
 -- Module Implementation
@@ -357,6 +361,24 @@ begin
 	---------------------------
 	o_ready <= '1' when state = IDLE else '0';
 
+	--------------------------------------------
+	-- Pmod SF3 SPI Frequency Generator Reset --
+	--------------------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+			
+			-- Disable SPI Frequency Generator
+			if (state = IDLE) then
+				spi_freq_gen_reset <= '1';
+			
+			-- Enable SPI Frequency Generator 
+			else
+				spi_freq_gen_reset <= '0';
+			end if;
+		end if;
+	end process;
+
 	--------------------------------------
 	-- Pmod SF3 SPI Frequency Generator --
 	--------------------------------------
@@ -366,11 +388,11 @@ begin
 		
 		PORT map (
 			i_sys_clock => i_sys_clock,
-			i_reset => i_reset,
+			i_reset => spi_freq_gen_reset,
 			i_spi_single_enable => spi_single_enable,
 			i_spi_dual_enable => spi_dual_enable,
 			i_dummy_cycles => dummy_cycles,
-			o_spi_freq => spi_freq,
+			o_spi_freq => spi_freq_en,
 			o_using_sys_freq => o_spi_using_sys_freq);
 
 	--------------------------------------
@@ -405,15 +427,31 @@ begin
 			o_spi_dual_enable => spi_dual_enable,
 			o_spi_quad_enable => spi_quad_enable);
 
+	-----------------------------------
+	-- Pmod SF3 SPI Controller Start --
+	-----------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+			
+			-- Start SPI Controller
+			if (state = START) then
+				spi_start <= '1';
+			else
+				spi_start <= '0';
+			end if;
+		end if;
+	end process;
+
 	-----------------------------
 	-- Pmod SF3 SPI Controller --
 	-----------------------------
 	inst_PmodSF3SPIController: PmodSF3SPIController
 		PORT map (
 			i_sys_clock => i_sys_clock,
-			i_sys_clock_en => spi_freq,
+			i_sys_clock_en => spi_freq_en,
 			i_reset => i_reset,
-			i_start => i_start,
+			i_start => spi_start,
 			i_spi_single_enable => spi_single_enable,
 			i_spi_dual_enable => spi_dual_enable,
 			i_mode => i_rw,

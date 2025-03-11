@@ -11,14 +11,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="21.000001 us"></ZoomEndTime>
-      <Cursor1Time time="17.305000 us"></Cursor1Time>
+      <ZoomEndTime time="19.000001 us"></ZoomEndTime>
+      <Cursor1Time time="19.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="179"></NameColumnWidth>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="38" />
+   <WVObjectSize size="42" />
    <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/i_sys_clock">
       <obj_property name="ElementShortName">i_sys_clock</obj_property>
       <obj_property name="ObjectShortName">i_sys_clock</obj_property>
@@ -92,13 +92,29 @@
       <obj_property name="ElementShortName">o_ready</obj_property>
       <obj_property name="ObjectShortName">o_ready</obj_property>
    </wvobject>
+   <wvobject fp_name="divider369" type="divider">
+      <obj_property name="label">SPI Freq Gen</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/spi_freq_gen_reset">
+      <obj_property name="ElementShortName">spi_freq_gen_reset</obj_property>
+      <obj_property name="ObjectShortName">spi_freq_gen_reset</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIFrequencyGenerator/spi_clock_div_ref">
+      <obj_property name="ElementShortName">spi_clock_div_ref</obj_property>
+      <obj_property name="ObjectShortName">spi_clock_div_ref</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIFrequencyGenerator/spi_clock_div">
+      <obj_property name="ElementShortName">spi_clock_div</obj_property>
+      <obj_property name="ObjectShortName">spi_clock_div</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIFrequencyGenerator/spi_freq_reg">
+      <obj_property name="ElementShortName">spi_freq_reg</obj_property>
+      <obj_property name="ObjectShortName">spi_freq_reg</obj_property>
+   </wvobject>
    <wvobject fp_name="divider630" type="divider">
       <obj_property name="label">SPI Controller</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/spi_freq">
-      <obj_property name="ElementShortName">spi_freq</obj_property>
-      <obj_property name="ObjectShortName">spi_freq</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/Testbench_PmodSF3Driver/uut/inst_PmodSF3SPIController/mem_mode_reg">
       <obj_property name="ElementShortName">mem_mode_reg</obj_property>

@@ -48,28 +48,28 @@ ARCHITECTURE Behavioral of Testbench_PmodSF3Driver is
 COMPONENT PmodSF3Driver is
 
 GENERIC(
-	sys_clock: INTEGER := 100_000_000;
-	max_data_byte: INTEGER := 1
+   sys_clock: INTEGER := 100_000_000;
+   max_data_byte: INTEGER := 1
 );
 
 PORT(
-	i_sys_clock: IN STD_LOGIC;
-	i_reset: IN STD_LOGIC;
-    i_start: IN STD_LOGIC;
-    i_rw: IN STD_LOGIC;
-    i_command: IN UNSIGNED(7 downto 0);
-	i_addr_bytes: IN INTEGER range 0 to 4;
-    i_addr: IN UNSIGNED(23 downto 0);
-    i_data_bytes: IN INTEGER range 0 to max_data_byte;
-	i_data: IN UNSIGNED((max_data_byte*8)-1 downto 0);
-	o_data: OUT UNSIGNED((max_data_byte*8)-1 downto 0);
-	o_data_ready: OUT STD_LOGIC;
-    o_ready: OUT STD_LOGIC;
-	o_reset: OUT STD_LOGIC;
-	o_sclk: OUT STD_LOGIC;
-	io_dq: INOUT STD_LOGIC_VECTOR(3 downto 0);
-	o_ss: OUT STD_LOGIC;
-	o_spi_using_sys_freq: OUT STD_LOGIC
+   i_sys_clock: IN STD_LOGIC;
+   i_reset: IN STD_LOGIC;
+   i_start: IN STD_LOGIC;
+   i_rw: IN STD_LOGIC;
+   i_command: IN UNSIGNED(7 downto 0);
+   i_addr_bytes: IN INTEGER range 0 to 4;
+   i_addr: IN UNSIGNED(23 downto 0);
+   i_data_bytes: IN INTEGER range 0 to max_data_byte;
+   i_data: IN UNSIGNED((max_data_byte*8)-1 downto 0);
+   o_data: OUT UNSIGNED((max_data_byte*8)-1 downto 0);
+   o_data_ready: OUT STD_LOGIC;
+   o_ready: OUT STD_LOGIC;
+   o_reset: OUT STD_LOGIC;
+   o_sclk: OUT STD_LOGIC;
+   io_dq: INOUT STD_LOGIC_VECTOR(3 downto 0);
+   o_ss: OUT STD_LOGIC;
+   o_spi_using_sys_freq: OUT STD_LOGIC
 );
 
 END COMPONENT;
@@ -320,45 +320,45 @@ dq <=   (others => 'Z'),
         -- SPI Single Mode --
         -- Read Volatile Dummy Cycles
         -- 1 Byte (0xFB)
-        "0010" after 375 ns,
-        "0010" after 395 ns,
-        "0010" after 415 ns,
-        "0010" after 435 ns,
-        "0010" after 455 ns,
-        "0000" after 475 ns,
-        "0010" after 495 ns,
-        "0010" after 515 ns,
-        (others => 'Z') after 535 ns,
+        "0010" after 405 ns,
+        "0010" after 425 ns,
+        "0010" after 445 ns,
+        "0010" after 465 ns,
+        "0010" after 485 ns,
+        "0000" after 505 ns,
+        "0010" after 525 ns,
+        "0010" after 545 ns,
+        (others => 'Z') after 565 ns,
 
         -- Read Volatile SPI Mode
         -- 1 Byte (0xFF)
-        "0010" after 2175 ns,
-        "0010" after 2195 ns,
-        "0010" after 2215 ns,
-        "0010" after 2235 ns,
-        "0010" after 2255 ns,
-        "0010" after 2275 ns,
-        "0010" after 2295 ns,
-        "0010" after 2315 ns,
+        "0010" after 2205 ns,
+        "0010" after 2225 ns,
+        "0010" after 2245 ns,
+        "0010" after 2265 ns,
+        "0010" after 2285 ns,
+        "0010" after 2305 ns,
+        "0010" after 2325 ns,
+        "0010" after 2345 ns,
         -- Write Data, Write Volatile Dummy Cycles (2), Write Volatile SPI Mode (Dual)
-        (others => 'Z') after 2335 ns,
+        (others => 'Z') after 2365 ns,
 
         -- SPI Dual Mode --
         -- Read Volatile Dummy Cycles (2)
         -- 1 Byte (0x2B)
-        "0000" after 8105 ns,
-        "0010" after 8125 ns,
+        "0000" after 8125 ns,
         "0010" after 8145 ns,
-        "0011" after 8165 ns,
-        (others => 'Z') after 8185 ns,
+        "0010" after 8165 ns,
+        "0011" after 8185 ns,
+        (others => 'Z') after 8205 ns,
 
         -- Read Volatile SPI Mode (Dual)
         -- 1 Byte (0xBF)
-        "0010" after 9095 ns,
-        "0011" after 9115 ns,
-        "0011" after 9135 ns,
-        "0011" after 9155 ns,
-        (others => 'Z') after 9175 ns,
+        "0010" after 9125 ns,
+        "0011" after 9145 ns,
+        "0011" after 9165 ns,
+        "0011" after 9185 ns,
+        (others => 'Z') after 9205 ns,
 
         -- Write Data, Write Volatile Dummy Cycles (0), Write Volatile SPI Mode (Quad)
         (others => 'Z') after 9800 ns,
@@ -366,20 +366,20 @@ dq <=   (others => 'Z'),
         -- SPI Quad Mode --
         -- Read Volatile Dummy Cycles (0)
         -- 1 Byte (0xFB)
-        "1111" after 13055 ns,
-        "1011" after 13075 ns,
-        (others => 'Z') after 13095 ns,
+        "1111" after 13085 ns,
+        "1011" after 13105 ns,
+        (others => 'Z') after 13125 ns,
         -- Read Volatile SPI Mode (Quad)
         -- 1 Byte (0x7F)
-        "0111" after 14055 ns,
-        "1111" after 14075 ns,
-        (others => 'Z') after 14095 ns,
+        "0111" after 14085 ns,
+        "1111" after 14105 ns,
+        (others => 'Z') after 14125 ns,
 
         -- Read Data
         -- 1 Byte (0xC1)
-        "1100" after 17275 ns,
-        "0001" after 17295 ns,
-        (others => 'Z') after 17315 ns;
+        "1100" after 17305 ns,
+        "0001" after 17325 ns,
+        (others => 'Z') after 17345 ns;
 
 uut: PmodSF3Driver
     GENERIC map(
