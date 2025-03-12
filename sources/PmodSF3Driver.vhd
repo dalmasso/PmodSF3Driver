@@ -205,8 +205,10 @@ signal spi_dual_enable: STD_LOGIC := '0';
 signal spi_quad_enable: STD_LOGIC := '0'; 
 
 -- SPI Frequency Generator
-signal spi_freq_gen_reset: STD_LOGIC := '0';
 signal spi_freq_en: STD_LOGIC := '0';
+
+-- SPI Controller Reset
+signal spi_reset: STD_LOGIC := '0';
 
 -- SPI Controller Start
 signal spi_start: STD_LOGIC := '0';
@@ -361,24 +363,6 @@ begin
 	---------------------------
 	o_ready <= '1' when state = IDLE else '0';
 
-	--------------------------------------------
-	-- Pmod SF3 SPI Frequency Generator Reset --
-	--------------------------------------------
-	process(i_sys_clock)
-	begin
-		if rising_edge(i_sys_clock) then
-			
-			-- Disable SPI Frequency Generator
-			if (state = IDLE) then
-				spi_freq_gen_reset <= '1';
-			
-			-- Enable SPI Frequency Generator 
-			else
-				spi_freq_gen_reset <= '0';
-			end if;
-		end if;
-	end process;
-
 	--------------------------------------
 	-- Pmod SF3 SPI Frequency Generator --
 	--------------------------------------
@@ -388,7 +372,7 @@ begin
 		
 		PORT map (
 			i_sys_clock => i_sys_clock,
-			i_reset => spi_freq_gen_reset,
+			i_reset => i_reset,
 			i_spi_single_enable => spi_single_enable,
 			i_spi_dual_enable => spi_dual_enable,
 			i_dummy_cycles => dummy_cycles,
@@ -428,6 +412,22 @@ begin
 			o_spi_quad_enable => spi_quad_enable);
 
 	-----------------------------------
+	-- Pmod SF3 SPI Controller Reset --
+	-----------------------------------
+	process(i_sys_clock)
+	begin
+		if rising_edge(i_sys_clock) then
+			
+			-- Start SPI Controller
+			if (state = IDLE) then
+				spi_reset <= '1';
+			else
+				spi_reset <= '0';
+			end if;
+		end if;
+	end process;
+
+	-----------------------------------
 	-- Pmod SF3 SPI Controller Start --
 	-----------------------------------
 	process(i_sys_clock)
@@ -450,7 +450,7 @@ begin
 		PORT map (
 			i_sys_clock => i_sys_clock,
 			i_sys_clock_en => spi_freq_en,
-			i_reset => i_reset,
+			i_reset => spi_reset,
 			i_start => spi_start,
 			i_spi_single_enable => spi_single_enable,
 			i_spi_dual_enable => spi_dual_enable,
