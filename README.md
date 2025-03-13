@@ -10,9 +10,12 @@ For each read/write operation, user specifies the number of expected address and
 
 ## Usage
 
-The 'o_ready' signal indicates this module is ready to start new SPI transmission. 
+The 'o_ready' signal indicates this module is ready to start new SPI transmission.
+
 For each read/write operation, user specifies the number of expected address and data bytes, 'i_addr_bytes' and 'i_data_bytes' respectively.
-The 'i_start' signal starts the SPI communication, according to the mode 'i_rw' (Read or Write memory), command/address/data bytes and the expected number of bytes.  
+
+The 'i_start' signal starts the SPI communication, according to the mode 'i_rw' (Read or Write memory), command/address/data bytes and the expected number of bytes.
+
 In Read operation, when the 'o_data_ready', data from memory is available in 'o_data' signal.
 
 ## Pin Description
