@@ -31,7 +31,7 @@
 --		Output 	-	o_ready: Module Ready ('0': NOT Ready, '1': Ready)
 --		Output 	-	o_reset: FLASH Reset ('0': Reset, '1': No Reset)
 --		Output 	-	o_sclk: SPI Serial Clock
---		Output 	-	io_dq: SPI Data Lines (Simple, Dual or Quad Modes)
+--		In/Out 	-	io_dq: SPI Data Lines (Simple, Dual or Quad Modes)
 --		Output 	-	o_ss: SPI Slave Select Line ('0': Enable, '1': Disable)
 --		Output 	-	o_using_sys_freq: System Input Clock as SPI Serial Clock Frequency ('0': Disable, '1': Enable)
 ------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 --		Output 	-	o_led: Pmod SF3 Data from Memory
 --		Output 	-	o_reset: Pmod SF3 Reset ('0': Reset, '1': No Reset)
 --		Output 	-	o_sclk: Pmod SF3SPI Serial Clock
---		Output 	-	io_dq: Pmod SF3SPI Data Lines (Simple, Dual or Quad Modes)
+--		In/Out 	-	io_dq: Pmod SF3SPI Data Lines (Simple, Dual or Quad Modes)
 --		Output 	-	o_ss: Pmod SF3 SPI Slave Select Line ('0': Enable, '1': Disable)
 ------------------------------------------------------------------------
 
