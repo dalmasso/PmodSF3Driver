@@ -16,6 +16,7 @@
 --
 -- Generics
 --		sys_clock: System Input Clock Frequency (Hz)
+--		max_data_byte: Maximum number of Data Bytes in the driver
 -- Ports
 --		Input 	-	i_sys_clock: System Input Clock
 --		Input 	-	i_reset: Module Reset ('0': No Reset, '1': Reset)
