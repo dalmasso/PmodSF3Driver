@@ -8,6 +8,8 @@ User specifies the maximum bytes buffer used for data read & write.
 
 For each read/write operation, user specifies the number of expected address and data bytes.
 
+<img width="538" alt="PmodSF3Driver" src="https://github.com/user-attachments/assets/1c51e211-b1c7-4501-8848-de7c385cea96" />
+
 ## Usage
 
 The 'o_ready' signal indicates this module is ready to start new SPI transmission.
